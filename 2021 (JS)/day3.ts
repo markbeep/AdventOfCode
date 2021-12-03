@@ -1,6 +1,8 @@
 let fs = require('fs');
 
-let d: Array<string> = fs.readFileSync("day3.txt", "utf8").trim().split("\n");
+let d: Array<string> = fs.readFileSync("day3.txt", "utf8")
+    .trim()
+    .split("\n");
 d = d.map((e) => e.trim());
 
 let gamma = "", gamma1 = "";
