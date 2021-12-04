@@ -22,7 +22,8 @@ for (let i = 0; i < k.length; i+=5) {
 }
 
 // ------------------------ TASK 1 ------------------------
-function task1(ele: Array<number>, boards: Array<Array<Array<number>>>, f: Array<number>) {
+function task1(ele: Array<number>, boards: Array<Array<Array<number>>>) {
+    let f: Array<number> = [];
     for (let e = 0; e < ele.length; e++) {
         f.push(ele[e]);
         for (let i = 0; i < boards.length; i++) {
@@ -33,7 +34,7 @@ function task1(ele: Array<number>, boards: Array<Array<Array<number>>>, f: Array
         }
     }
 }
-console.log("Task 1: " + task1(ele, boards, []));
+console.log("Task 1: " + task1(ele, boards));
 
 
 // ------------------------ TASK 2 ------------------------
@@ -43,11 +44,10 @@ for (let e = 0; e < ele.length; e++) {
     f.push(ele[e]);
     boards = boards.filter(b => !kek(createB(f, b)));
     if (boards.length === 1) {
-        console.log("Task 2: " + task1(ele, boards, f));
+        console.log("Task 2: " + task1(ele, boards));
         break;
     }
 }
-
 
 // ------------------------ Helper Functions ------------------------
 function createB(elements: Array<number>, array: Array<Array<number>>) {
@@ -57,9 +57,9 @@ function createB(elements: Array<number>, array: Array<Array<number>>) {
 
 function kek(a: Array<Array<boolean>>) {
     // checks if any row or column is all true
-    return a.reduce((b, _, i) => b
-        || (a[i][0] && a[i][1] && a[i][2] && a[i][3] && a[i][4]
-        || a[0][i] && a[1][i] && a[2][i] && a[3][i] && a[4][i]), false);
+    return a.reduce((b, _, i) =>
+        b || (a[i][0] && a[i][1] && a[i][2] && a[i][3] && a[i][4]
+            || a[0][i] && a[1][i] && a[2][i] && a[3][i] && a[4][i]), false);
 }
 
 function su(a: number, b: Array<Array<number>>, bol: Array<Array<boolean>>) {
