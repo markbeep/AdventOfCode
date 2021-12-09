@@ -1,3 +1,4 @@
+const { time } = require('console');
 let fs = require('fs');
 
 let d = fs.readFileSync("day9.txt", "utf8")
@@ -18,6 +19,7 @@ for (let y = 0; y < d.length; y++) {
         };
         let res = dfs(y, x);  // TASK 2
         if (!equal(res)) {
+            drawTable();
             c[res[0]][res[1]]++;
             m[y][x] = res;
         }
@@ -29,18 +31,29 @@ console.log("Task 1: " + t);
 let k = [].concat(...c).filter(e => e > 0).sort((a, b) => b-a);
 console.log("Task 2: " + k[0]*k[1]*k[2]);
 
-// draws in console
-let ENDC = '\033[0m';
-for (let y = 0; y < dp.length; y++) {
-    let line = "";
-    for (let x = 0; x < dp[0].length; x++) {
-        if (!equal(dp[y][x])) line += "\033[" + (c[dp[y][x][0]][dp[y][x][1]] % 5 + 90) + "m" + "█" + ENDC;
-        else line += '\033[2m' + "█" + ENDC;
-    }
-    console.log(line);
-}
 
 // ----------- HELPER FUNCS -----------
+function sleep(ms) {
+    const stop = new Date().getTime() + ms;
+    while (new Date().getTime() < stop);
+}
+function drawTable() {
+    console.log("\033[0;0H");
+    let ENDC = '\033[0m';
+    let msg = [];
+    for (let y = 0; y < dp.length; y++) {
+        let line = "";
+        for (let x = 0; x < dp[0].length; x++) {
+            if (!equal(dp[y][x])) line += "\033[" + ((dp[y][x][0]+dp[y][x][1]) % 5 + 90) + "m" + "█" + ENDC;
+            else line += '\033[2m' + " " + ENDC;
+        }
+        msg.push(line);
+    }
+    console.log(msg.join("\n"));
+    console.log("\x1B[?25l");
+    sleep(0.3);
+}
+
 function dfs(y, x) {
     if (d[y][x] === 9 || vis[y][x] !== 0) return dp[y][x];  // ignore 9's or already visited
     if (isLowest(y, x)) return dp[y][x] = [y, x];  // lowest point? return coordinates
