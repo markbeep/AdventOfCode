@@ -11,6 +11,7 @@ let dp = create2DArray([-1, -1]);
 let vis = create2DArray(0);
 let m = create2DArray(0);
 
+let max = 1;  // always store max so we draw depending on it
 let t = 0;
 for (let y = 0; y < d.length; y++) {
     for (let x = 0; x < d[0].length; x++) {
@@ -19,8 +20,9 @@ for (let y = 0; y < d.length; y++) {
         };
         let res = dfs(y, x);  // TASK 2
         if (!equal(res)) {
+            let val = ++c[res[0]][res[1]];
+            max = Math.max(max, val);
             drawTable();
-            c[res[0]][res[1]]++;
             m[y][x] = res;
         }
     }
@@ -44,7 +46,7 @@ function drawTable() {
     for (let y = 0; y < dp.length; y++) {
         let line = "";
         for (let x = 0; x < dp[0].length; x++) {
-            if (!equal(dp[y][x])) line += "\033[" + ((dp[y][x][0]+dp[y][x][1]) % 5 + 90) + "m" + "█" + ENDC;
+            if (!equal(dp[y][x])) line += "\033[38;5;" + color(y,x) + "m" + "█" + ENDC;
             else line += '\033[2m' + " " + ENDC;
         }
         msg.push(line);
@@ -52,6 +54,11 @@ function drawTable() {
     console.log(msg.join("\n"));
     console.log("\x1B[?25l");
     sleep(0.3);
+}
+
+function color(y, x) {
+    let p = Math.floor(14.0*c[dp[y][x][0]][dp[y][x][1]] / max) - d[y][x];
+    return 246-p;
 }
 
 function dfs(y, x) {
