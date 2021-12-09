@@ -4,7 +4,7 @@ let d = fs.readFileSync("day9.txt", "utf8")
     .split("\n")
     .map(e => e.split("").map(e => 1*e));
 
-let create2DArray = (f) => new Array(d.length).fill(0).map(() => new Array(d[0].length).fill(f));
+let create2DArray = (f) => Array(d.length).fill().map((() => Array(d[0].length).fill(f)));
 let c = create2DArray(0);
 let dp = create2DArray([-1, -1]);
 let vis = create2DArray(0);
