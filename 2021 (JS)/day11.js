@@ -24,21 +24,18 @@ function countZero() {
 
 function increment() {
     let pos = []
-    d = d.map(e => e.map(v => (v+1)%10));
-    for (let y = 0; y < 10; y++) {
-        for (let x = 0; x < 10; x++) {
-            if (d[y][x] === 0) pos.push([y, x]);
-        }
-    }
+    d = d.map(e => e.map(v => (v+1)%10)); // increments all
+    pos = d.map((e, y) => e.map((v, x) => [y,x,v]).filter(v => v[2] === 0)); // makes list of all 0's xy coords
+    pos = [].concat(...pos);
     while (pos.length > 0) flashInc(...pos.pop());
 }
 
 function flashInc(y, x) {
     if (d[y][x] !== 0) return;
     f++;
-    for (let yi = y-1; yi <= y+1; yi++) {
-        for (let xi = x-1; xi <= x+1; xi++) {
-            if (xi === x && yi === y || yi<0 || yi>9 || xi<0 || xi>9 || !d[yi][xi]) continue;
+    for (let yi = Math.max(y-1, 0); yi <= Math.min(y+1, 9); yi++) {
+        for (let xi = Math.max(x-1, 0); xi <= Math.min(x+1, 9); xi++) {
+            if (xi === x && yi === y || !d[yi][xi]) continue;
             d[yi][xi] = (d[yi][xi]+1)%10;
             flashInc(yi, xi);
         }
