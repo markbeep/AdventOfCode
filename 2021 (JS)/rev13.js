@@ -3,35 +3,40 @@ let asciimo = require("./asciimo-master/lib/asciimo").Figlet;
 
 let text = "Words";
 let font = "Banner4";
-asciimo.write(text, font, function(art){
-    fs.writeFileSync("word.txt", art);
+
+
+asciimo.write(text, font, function(art) {
+    word = art.trim();
+    handleWord(word);
 });
 
-let word = fs.readFileSync("word.txt", "utf-8");
-word = word.trim();
+function handleWord(word) {
+    let folds = [];
+    let a = toArray(word);
 
-let folds = [];
-let a = toArray(word);
-
-for (let i = 0; i < 8; i++) {
-    a = unfold(a);
-    // draw(a);
-}
-
-let coords = []
-for (let y = 0; y < a.length; y++) {
-    for (let x = 0; x < a[0].length; x++) {
-        if (a[y][x]) coords.push(`${x},${y}`);
+    for (let i = 0; i < 8; i++) {
+        a = unfold(a, folds);
+        // draw(a);
     }
+
+    let coords = []
+    for (let y = 0; y < a.length; y++) {
+        for (let x = 0; x < a[0].length; x++) {
+            if (a[y][x]) coords.push(`${x},${y}`);
+        }
+    }
+    msg = coords.join("\n") + "\n\n";
+    folds.reverse();
+    msg += folds.join("\n");
+
+    fs.writeFile("day13.txt", msg, (err, cont) => {
+        console.log("Finished");
+        console.log(word);
+    });
 }
-msg = coords.join("\n") + "\n\n";
-folds.reverse();
-msg += folds.join("\n");
-
-fs.writeFileSync("day13.txt", msg)
 
 
-function unfold(a) {
+function unfold(a, folds) {
     if (Math.random() > 0.5) {  // unfold y
         let n = new Array(2*a.length+1).fill().map(() => new Array(a[0].length).fill(false));
         let num = a.length;
