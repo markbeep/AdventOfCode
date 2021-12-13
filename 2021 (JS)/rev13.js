@@ -1,8 +1,8 @@
 let fs = require('fs');
 let asciimo = require("./asciimo-master/lib/asciimo").Figlet;
 
-let text = "Nend Sudes";
-let font = "Banner";
+let text = "Words";
+let font = "Banner4";
 asciimo.write(text, font, function(art){
     fs.writeFileSync("word.txt", art);
 });
