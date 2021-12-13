@@ -5,6 +5,7 @@ let d = fs.readFileSync("day13.txt", "utf8")
     .split("\n");
 
 let nu = d.filter(e => e[0]!=="f" && e.length>0).map(e => e.split(",").map(e=>e*1));
+let m = Math.max(...[].concat(...nu));
 d = d.filter(e => e[0] === "f");
 let folds = new Array(d.length).fill();
 for (let i = 0; i < folds.length; i++) {
@@ -13,7 +14,7 @@ for (let i = 0; i < folds.length; i++) {
     folds[i] = [v, k[1]*1];
 }
 
-let val = 2000;
+let val = m+1;
 let a = new Array(val).fill().map(() => new Array(val).fill(false));
 
 for (let i = 0; i < nu.length; i++) {
@@ -24,9 +25,9 @@ for (let i = 0; i < folds.length; i++) {
     let axis = folds[i][0];
     let num = folds[i][1];
     a = fold(axis, num);
-    console.log(count(a));
-    draw(a);
 }
+console.log(count(a));
+draw(a);
 
 function count(a) {
     let c = 0;
@@ -78,3 +79,4 @@ function fold(axis, num) {
         return n;
     }
 }
+
