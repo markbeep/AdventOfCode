@@ -1,9 +1,8 @@
 let fs = require('fs');
 let asciimo = require("./asciimo-master/lib/asciimo").Figlet;
 
-let text = "Words";
-let font = "Banner4";
-
+let text = "skius chill";
+let font = "Banner";
 
 asciimo.write(text, font, function(art) {
     word = art.trim();
@@ -14,7 +13,7 @@ function handleWord(word) {
     let folds = [];
     let a = toArray(word);
 
-    for (let i = 0; i < 8; i++) {
+    for (let i = 0; i < 20; i++) {
         a = unfold(a, folds);
         // draw(a);
     }
@@ -32,6 +31,7 @@ function handleWord(word) {
     fs.writeFile("day13.txt", msg, (err, cont) => {
         console.log("Finished");
         console.log(word);
+        console.log(`Size ${coords.length}`);
     });
 }
 
