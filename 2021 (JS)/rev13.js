@@ -1,5 +1,5 @@
 let fs = require('fs');
-let asciimo = require("./asciimo-master/lib/asciimo").Figlet;
+let asciimo = require('asciimo').Figlet;
 
 let text = "skius chill";
 let font = "Banner";
@@ -13,7 +13,7 @@ function handleWord(word) {
     let folds = [];
     let a = toArray(word);
 
-    for (let i = 0; i < 20; i++) {
+    for (let i = 0; i < 5; i++) {
         a = unfold(a, folds);
         // draw(a);
     }
