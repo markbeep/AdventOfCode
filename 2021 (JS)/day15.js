@@ -1,9 +1,12 @@
+const { time, timeEnd } = require("console");
 let PriorityQueue = require("js-priority-queue");
 
 require('fs').readFile("day15.txt", "utf-8", function(err, data) {
     let arr = data.trim().split("\n");
     arr = arr.map(e => e.trim().split("").map(b => b*1));
+    time("Time");
     main(arr);
+    timeEnd("Time");
 });
 
 function main(arr) {
@@ -19,7 +22,7 @@ function main(arr) {
 
 function dijkstra(S) {
     S.distance = 0;
-    let pq = new PriorityQueue({ comparator:(a,b) => a.distance-b.distance });
+    let pq = new PriorityQueue({ strategy: PriorityQueue.BinaryHeapStrategy, comparator:(a,b) => a.distance-b.distance });
     pq.queue(S, 0);
     while (pq.length > 0) { 
         let U = pq.dequeue();
