@@ -10,9 +10,13 @@ require('fs').readFile("day15.txt", "utf-8", function(err, data) {
 });
 
 function main(arr) {
+    time("Copy Arr");
     arr = copy(arr);
+    timeEnd("Copy Arr");
 
+    time("Link Nodes");
     let nodes = createGraph(arr);
+    timeEnd("Link Nodes");
     
     counter = 0;
     dijkstra(nodes[0][0]);
@@ -44,10 +48,11 @@ function createGraph(arr) {
     let nodes = arr.map(a => (a.map(b => ({ edges: [], vis: false, value: b, distance: Infinity}))));
     for (let y = 0; y < nodes.length; y++) {
         for (let x = 0; x < nodes[0].length; x++) {
-            if (y > 0) nodes[y][x].edges.push(nodes[y-1][x]);
-            if (x > 0) nodes[y][x].edges.push(nodes[y][x-1]);
-            if (y < nodes.length-1) nodes[y][x].edges.push(nodes[y+1][x]);
-            if (x < nodes[0].length-1) nodes[y][x].edges.push(nodes[y][x+1]);
+            let n = nodes[y][x];
+            if (y > 0) n.edges.push(nodes[y-1][x]);
+            if (x > 0) n.edges.push(nodes[y][x-1]);
+            if (y < nodes.length-1) n.edges.push(nodes[y+1][x]);
+            if (x < nodes[0].length-1) n.edges.push(nodes[y][x+1]);
         }
     }
     return nodes;
