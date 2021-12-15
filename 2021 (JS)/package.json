@@ -12,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "asciimo": "^0.3.1"
+    "asciimo": "^0.3.1",
+    "js-priority-queue": "^0.1.5"
   }
 }

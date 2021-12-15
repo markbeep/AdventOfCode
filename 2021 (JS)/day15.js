@@ -1,4 +1,4 @@
-const { time, timeEnd } = require('console');
+let PriorityQueue = require("js-priority-queue");
 
 require('fs').readFile("day15.txt", "utf-8", function(err, data) {
     let arr = data.trim().split("\n");
@@ -19,9 +19,9 @@ function main(arr) {
 
 function dijkstra(S) {
     S.distance = 0;
-    let pq = new PriorityQueue();
-    pq.enqueue(S, 0);
-    while (!pq.isEmpty()) { 
+    let pq = new PriorityQueue({ comparator:(a,b) => a.distance-b.distance });
+    pq.queue(S, 0);
+    while (pq.length > 0) { 
         let U = pq.dequeue();
         U.vis = true;
         U.edges.forEach(V => {
@@ -29,7 +29,7 @@ function dijkstra(S) {
                 let tmpDist = U.distance + V.value;
                 if (tmpDist < V.distance) {
                     V.distance = tmpDist;
-                    pq.enqueue(V, V.distance);
+                    pq.queue(V, V.distance);
                 }
         }
         });
@@ -60,33 +60,4 @@ function copy(arr) {
         }
     }
     return n;
-}
-
-class PriorityQueue {
-    constructor() {
-        this.items = []
-    }
-    enqueue(item, priority) {
-        if (this.isEmpty()) {
-            this.items.push({ item:item, priority:priority });
-            return;
-        }
-        let index;
-        for (let i = 0; i < this.items.length; i++) {
-            if (this.items[i].priority <= priority) {
-                index = i;
-                break;
-            }
-            index = i+1;
-        }
-        this.items.splice(index, 0, {  item:item, priority:priority });
-    }
-
-    dequeue() {
-        return this.items.pop().item;
-    }
-
-    isEmpty() {
-        return this.items.length === 0;
-    }
 }
