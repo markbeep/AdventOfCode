@@ -3,50 +3,39 @@ const { time, timeEnd } = require('console');
 require('fs').readFile("day15.txt", "utf-8", function(err, data) {
     let arr = data.trim().split("\n");
     arr = arr.map(e => e.trim().split("").map(b => b*1));
-    time("Timer");
     main(arr);
-    timeEnd("Timer");
 });
 
 let counter = 0;
 
 function main(arr) {
+    time("Copy");
     arr = copy(arr);
+    timeEnd("Copy");
+
+    time("Create Node Graph");
     let nodes = createGraph(arr);
+    timeEnd("Create Node Graph");
+    
     counter = 0;
     dijkstra(nodes[0][0]);
     console.log("Task 1:", nodes[99][99].distance);
     console.log("Task 2:", nodes[nodes.length-1][nodes[0].length-1].distance);
 }
 
-function getFromQ(Q) {
-    let n;
-    let m = Infinity;
-    Q.forEach(node => {
-        if (m > node.distance && !node.vis) {
-            n = node;
-            m = n.distance;
-        };
-    });
-    return n;
-}
-
 function dijkstra(S) {
-    let Q = [S];
     S.distance = 0;
-    let U;
-    while ((U = getFromQ(Q)) != null) { 
-        counter++;
-        if (counter % 30 === 0) {
-            Q = Q.filter(e => !e.vis);
-        }
+    let pq = new PriorityQueue();
+    pq.enqueue(S, 0);
+    while (!pq.isEmpty()) { 
+        let U = pq.dequeue();
         U.vis = true;
         U.edges.forEach(V => {
             if (!V.vis) {
                 let tmpDist = U.distance + V.value;
                 if (tmpDist < V.distance) {
                     V.distance = tmpDist;
-                    Q.push(V);
+                    pq.enqueue(V, V.distance);
                 }
         }
         });
@@ -55,6 +44,8 @@ function dijkstra(S) {
 }
 
 function createGraph(arr) {
+    console.group("create Graph");
+    time("node")
     let nodes = arr.map(a => a.map(b => new Node()));
     for (let y = 0; y < nodes.length; y++) {
         for (let x = 0; x < nodes[0].length; x++) {
@@ -67,6 +58,7 @@ function createGraph(arr) {
             nodes[y][x].y = y;
         }
     }
+    console.groupEnd("create Graph");
     return nodes;
 }
 
