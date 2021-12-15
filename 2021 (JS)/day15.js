@@ -6,16 +6,10 @@ require('fs').readFile("day15.txt", "utf-8", function(err, data) {
     main(arr);
 });
 
-let counter = 0;
-
 function main(arr) {
-    time("Copy");
     arr = copy(arr);
-    timeEnd("Copy");
 
-    time("Create Node Graph");
     let nodes = createGraph(arr);
-    timeEnd("Create Node Graph");
     
     counter = 0;
     dijkstra(nodes[0][0]);
@@ -31,7 +25,7 @@ function dijkstra(S) {
         let U = pq.dequeue();
         U.vis = true;
         U.edges.forEach(V => {
-            if (!V.vis) {
+            if (V != undefined && !V.vis) {
                 let tmpDist = U.distance + V.value;
                 if (tmpDist < V.distance) {
                     V.distance = tmpDist;
@@ -44,21 +38,15 @@ function dijkstra(S) {
 }
 
 function createGraph(arr) {
-    console.group("create Graph");
-    time("node")
-    let nodes = arr.map(a => a.map(b => new Node()));
+    let nodes = arr.map(a => (a.map(b => ({ edges: [], vis: false, value: b, distance: Infinity}))));
     for (let y = 0; y < nodes.length; y++) {
         for (let x = 0; x < nodes[0].length; x++) {
             if (y > 0) nodes[y][x].edges.push(nodes[y-1][x]);
             if (x > 0) nodes[y][x].edges.push(nodes[y][x-1]);
             if (y < nodes.length-1) nodes[y][x].edges.push(nodes[y+1][x]);
             if (x < nodes[0].length-1) nodes[y][x].edges.push(nodes[y][x+1]);
-            nodes[y][x].value = arr[y][x];
-            nodes[y][x].x = x;
-            nodes[y][x].y = y;
         }
     }
-    console.groupEnd("create Graph");
     return nodes;
 }
 
@@ -72,13 +60,6 @@ function copy(arr) {
         }
     }
     return n;
-}
-
-class Node {
-    edges = [];
-    vis = false;
-    value;
-    distance = Infinity;
 }
 
 class PriorityQueue {
