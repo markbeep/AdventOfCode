@@ -1,93 +1,122 @@
-const { group, groupEnd } = require('console');
-
 require('fs').readFile("day16.txt", "utf-8", function(err, data) {
     let inp = data.trim();
     let binaryLength = inp.length * 4;
     inp = BigInt("0x"+inp);
-    // console.log("VALUE:", inp);
     main(inp.toString(2).padStart(binaryLength, "0"));
 });
 
 function main(binary) {
-    let res = rec(binary);
-    console.log("Result:", res);
+    let lit = new Operator(binary);
+    console.log("Task 1:", Number(lit.totalVersion));
+    console.log("Task 2:", Number(lit.value));
 }
-
-function printBinary(binary) {
-    console.log("\033[31m"+binary.slice(0,3)+"\033[32m"+binary.slice(3,6)+"\033[0m"+binary.slice(6));
-}
-
-function rec(binary) {
-    let lit = new Literal(binary);
-    console.log(lit);
-    let val = 0n;
-    let index = 0n;
-    let version = lit.version;
-
-    if (lit.type == 4) {
-        val += lit.literal;
-        index = lit.literalEnding;
-    }
-    else {
-        if (lit.lengthIndicator == 0) {
-            let cursor = 0n;
-            let str = lit.rest;
-            while (cursor < lit.length) {
-                console.log("CURSOR", cursor, "BINARY", str, "LENGTH", str.length, "LITLEN", lit.length);
-                let res = rec(str);
-                val += res.val;
-                version += res.version;
-                cursor += res.index;
-                console.log(res.index);
-                str = str.slice(Number(res.index));
-                break;
-            }
-            index = 7n + 15n + lit.length;
-        }
-        else {
-            let str = lit.rest;
-            for (let i = 0n; i < lit.packets; i++) {
-                let res = rec(str);
-                val += res.val;
-                version += res.version;
-                str = str.slice(Number(res.index));
-            }
-        }
-    }
-    return { val, index, version };
-}  
 
 class Literal {
     constructor(binary) {
-        printBinary(binary);
         this.version = BigInt("0b"+binary.slice(0, 3));
+        this.totalVersion = this.version;
         this.type = BigInt("0b"+binary.slice(3, 6));
-        this.lengthIndicator = -1;
-        this.length = 0n;
-        this.literalEnding;
-        this.literal;
-        this.rest = binary.slice(6);
-        this.packets;
-        if (this.type == 4) {
-            let l = [];
-            let cursor = 0;
-            while (true) {
-                l.push(this.rest.slice(cursor+1, cursor+5));
-                if (this.rest[cursor] === "0") break;
-                cursor += 5;
+        let l = [];
+        let cursor = 0n;
+        let str = binary.slice(6);
+        while (true) {
+            l.push(str.slice(Number(cursor)+1, Number(cursor)+5));
+            if (str[cursor] === "0") break;
+            cursor += 5n;
+        }
+        this.totalPacketSize = 6n + 5n + cursor;
+        this.value = BigInt("0b"+l.join(""));
+    }
+}
+
+class Operator {
+    constructor(binary) {
+        this.version = BigInt("0b"+binary.slice(0, 3));
+        this.binary = binary;
+        this.type = BigInt("0b"+binary.slice(3, 6));
+        this.totalPacketSize = 7n;
+        this.totalVersion = this.version;
+        this.subpackets = [];
+        this.typeGotten = -1;
+        this.value = 0n;
+        let lengthIndicator = parseInt(binary[6]);
+
+        if (lengthIndicator == 0) {
+            this.totalPacketSize += 15n;
+            if (binary.length < 22) return;
+            let length = BigInt("0b"+binary.slice(7, 22));
+            let str = binary.slice(22);
+            let lengthAdded = 0n;
+            while (str.length > 11 && lengthAdded < length) {
+                let lit;
+                if (getType(str) === 4n) lit = new Literal(str);
+                else lit = new Operator(str);
+                this.typeGotten = getType(str);
+                this.subpackets.push(lit);
+                str = str.slice(Number(lit.totalPacketSize));
+                this.totalPacketSize += lit.totalPacketSize;
+                lengthAdded += lit.totalPacketSize;
+                this.totalVersion += lit.totalVersion;
             }
-            this.literalEnding = BigInt(cursor+5+6);
-            this.literal = BigInt("0b"+l.join(""));
-        } 
-        else {
-            this.lengthIndicator = parseInt(binary[6]);
-            if (this.lengthIndicator == 0) {
-                this.length = BigInt("0b"+binary.slice(7, 22));
-                this.rest = binary.slice(22);
-            } else {
-                this.packets = BigInt("0b"+binary.slice(7, 18));
-                this.rest = binary.slice(18);
+        } else {
+            this.totalPacketSize += 11n;
+            let packetsCount = BigInt("0b"+binary.slice(7, 18));
+            let str = binary.slice(18);
+            for (let i = 0n; i < packetsCount; i++) {
+                let lit;
+                if (str.length < 11) break;
+                if (getType(str) === 4n) lit = new Literal(str);
+                else lit = new Operator(str);
+                this.subpackets.push(lit);
+                str = str.slice(Number(lit.totalPacketSize));
+                this.totalPacketSize += lit.totalPacketSize;
+                this.totalVersion += lit.totalVersion;
             }
         }
+        switch (this.type) {
+            case 0n: this.value = sum(...this.subpackets); break;
+            case 1n: this.value = prod(...this.subpackets); break;
+            case 2n: this.value = min(...this.subpackets); break;
+            case 3n: this.value = max(...this.subpackets); break;
+            case 5n: this.value = (this.subpackets[0].value > this.subpackets[1].value) ? 1n: 0n; break;
+            case 6n: this.value = (this.subpackets[0].value < this.subpackets[1].value) ? 1n: 0n; break;
+            case 7n: this.value = (this.subpackets[0].value === this.subpackets[1].value) ? 1n: 0n; break;
+        }
     }
+}
+
+function max() {
+    let s = arguments[0].value;
+    for (let i = 1; i < arguments.length; i++) {
+        s = BigInt(Math.max(Number(arguments[i].value), Number(s)));
+    }
+    return s;
+}
+
+function min() {
+    let s = arguments[0].value;
+    for (let i = 1; i < arguments.length; i++) {
+        s = BigInt(Math.min(Number(arguments[i].value), Number(s)));
+    }
+    return s;
+}
+
+function prod() {
+    let s = 1n;
+    for (let i = 0; i < arguments.length; i++) {
+        s *= arguments[i].value;
+    }
+    return s;
+}
+
+function sum() {
+    let s = 0n;
+    for (let i = 0; i < arguments.length; i++) {
+        s += arguments[i].value;
+    }
+    return s;
+}
+
+function getType(binary) {
+    return BigInt("0b"+binary.slice(3, 6));
 }
