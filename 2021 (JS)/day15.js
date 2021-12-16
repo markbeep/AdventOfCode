@@ -1,24 +1,14 @@
-const { time, timeEnd } = require("console");
 let PriorityQueue = require("js-priority-queue");
 
 require('fs').readFile("day15.txt", "utf-8", function(err, data) {
     let arr = data.trim().split("\n");
     arr = arr.map(e => e.trim().split("").map(b => b*1));
-    time("Time");
     main(arr);
-    timeEnd("Time");
 });
 
 function main(arr) {
-    time("Copy Arr");
-    arr = copy(arr);
-    timeEnd("Copy Arr");
-
-    time("Link Nodes");
+    arr = create5Array(arr);
     let nodes = createGraph(arr);
-    timeEnd("Link Nodes");
-    
-    counter = 0;
     dijkstra(nodes[0][0]);
     console.log("Task 1:", nodes[99][99].distance);
     console.log("Task 2:", nodes[nodes.length-1][nodes[0].length-1].distance);
@@ -58,7 +48,7 @@ function createGraph(arr) {
     return nodes;
 }
 
-function copy(arr) {
+function create5Array(arr) {
     let n = new Array(5*arr.length).fill().map(_=> new Array(5*arr[0].length).fill(-1));
     for (let y = 0; y < n.length; y++) {
         for (let x = 0; x < n[0].length; x++) {
