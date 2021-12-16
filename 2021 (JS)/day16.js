@@ -1,3 +1,5 @@
+const { group, groupEnd } = require('console');
+
 require('fs').readFile("day16.txt", "utf-8", function(err, data) {
     let inp = data.trim();
     let binaryLength = inp.length * 4;
