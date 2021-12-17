@@ -1,5 +1,5 @@
 require('fs').readFile("day17.txt", "utf-8", function(err, data) {
-    let inp = data.trim().slice(15).replace("y=","").replaceAll("..", ", ").split(", ").map(e => e*1);
+    let inp = data.trim().match(/-?[0-9]+/g).map(e => e*1);
     main(...inp);
 });
 
