@@ -11,30 +11,21 @@ function main(inp) {
     let tab = new Tab(tabs[0]);
     for (let i = 1; i < tabs.length; i++) {
         tab = add(tab, new Tab(tabs[i]));
-        operate(tab);
+        while (findExplode(tab) || findSplit(tab));
     }
     console.log("Task 1:", mag(tab));
 
-    let l = [];
+    let l = -Infinity;
     for (let i = 0; i < inp.length; i++) {
         for (let j = 0; j < inp.length; j++) {
             if (i === j) continue;
-            let a = new Tab(tabs[i]);
-            let b = new Tab(tabs[j]);
-            let t = add(a, b);
-            operate(t);
-            l.push(mag(t));
+            let t = add(new Tab(tabs[i]), new Tab(tabs[j]));
+            while (findExplode(t) || findSplit(t));
+            l = Math.max(mag(t), l);
         }
     }
-    console.log("Task 2:", Math.max(...l));
+    console.log("Task 2:", l);
 
-}
-
-function operate(tab) {
-    while (true) {
-        if (findExplode(tab)) continue;
-        if (!findSplit(tab)) break;
-    }
 }
 
 function mag(tab) {
