@@ -110,7 +110,7 @@ function genMapping(c1, c2) {
             // l.push({x: p1[i][0]-p2[j][0], y: p2[j][1]-p1[i][1], z: p1[i][2]-p2[j][2]});
             // // 0 1 1
             // l.push({x: p1[i][0]-p2[j][0], y: p2[j][1]-p1[i][1], z: p2[j][2]-p1[i][2]});
-            // // 1 0 0
+            // // 1 0 0s
             // l.push({x: p2[j][0]-p1[i][0], y: p1[i][1]-p2[j][1], z: p1[i][2]-p2[j][2]});
             // // 1 0 1
             // l.push({x: p2[j][0]-p1[i][0], y: p1[i][1]-p2[j][1], z: p2[j][2]-p1[i][2]});
@@ -127,7 +127,7 @@ function genMapping(c1, c2) {
 // bruteforce all combinations
 function test(c1, c2, m={x:0, y:0, z:0}, rot={x:1, y:1, z:1}) {
     // console.log(c1, c2);
-    return (c1[0] === rot.x * (c2[0]+m.x)
-        && c1[1] === rot.y * (c2[1]+m.y)
-        && c1[2] === rot.z * (c2[2]+m.z));
+    return (c1[0] === rot.x * c2[0] + m.x
+        && c1[1] === rot.y * c2[1] + m.y
+        && c1[2] === rot.z * c2[2] + m.z);
 }
