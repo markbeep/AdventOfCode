@@ -36,11 +36,11 @@ function main(inp) {
             // console.log("Found Mapping:", mp, "| i:",i,"j:",j);
             if (mp != null) {
                 let [rotation, offset, matches] = mp;
-                // console.log("\tMatches:",matches);
                 scans[j].x = scans[i].x + offset.x;
                 scans[j].y = scans[i].y + offset.y;
                 scans[j].z = scans[i].z + offset.z;
                 console.log("Scanner:", j, ":", scans[j].x, scans[j].y, scans[j].z);
+                console.log("\tMatches:",matches);
             }
         }
     }
@@ -85,7 +85,7 @@ function findPossibleMappings(s1, s2) {
         for (let k = 0; k < s2.points.length; k++) {
             let c1 = s1.points[j];
             let c2 = s2.points[k];
-            for (let i = 0; i < 48; i++) {
+            for (let i = 0; i < 24; i++) {
                 let tmpMap = {x: c2[0], y: c2[1], z: c2[2]};
                 let m = rotate(i, tmpMap);
                 let offset = {x: c1[0]-m.x, y: c1[1]-m.y, z: c1[2]-m.z};
@@ -111,34 +111,19 @@ function isMap(c1, c2, offset={x:0, y:0, z:0}, rotation) {
 }
 
 const rotate = (i,o) => {
-    [
-        [o.x, o.y, o.z]
+    let x = [
+        [o.x, o.y, o.z], [o.x,-o.z, o.y], [o.x,-o.y,-o.z], [o.x, o.z,-o.y],
+        [o.y, o.z, o.x], [o.y,-o.x, o.z], [o.y,-o.z,-o.x], [o.y, o.x,-o.z],
+        [o.z, o.x, o.y], [o.z,-o.y, o.x], [o.z,-o.x,-o.y], [o.z, o.y,-o.x],
+        [-o.z,-o.y,-o.x], [-o.z, o.x,-o.y], [-o.z, o.y, o.x], [-o.z,-o.x, o.y],
+        [-o.y,-o.x,-o.z], [-o.y, o.z,-o.x], [-o.y, o.x, o.z], [-o.y,-o.z, o.x],
+        [-o.x,-o.z,-o.y], [-o.x, o.y,-o.z], [-o.x, o.z, o.y], [-o.x,-o.y, o.z],
     ]
-    let m = [
-        [1,1,1],
-        [1,1,-1],
-        [1,-1,1],
-        [1,-1,-1],
-        [-1,1,1],
-        [-1,1,-1],
-        [-1,-1,1],
-        [-1,-1,-1]
-    ];
-    let p = [
-        [0,1,2],
-        [0,2,1],
-        [1,0,2],
-        [1,2,0],
-        [2,0,1],
-        [2,1,0]
-    ];
-    let y = Math.floor(i / 6);  // 0-7
-    let x = i - 6 * y;  // 0-5
-    let qe = [o.x, o.y, o.z];
-    return { x: m[y][0]*qe[p[x][0]], y: m[y][1]*qe[p[x][1]], z: m[y][2]*qe[p[x][2]]};
+    return {x:x[i][0], y:x[i][1], z:x[i][2]};
+    
 }
 
 // let xexe = {x:-1,y:-2,z:-3};
-// for (let i = 0; i < 48; i++) {
+// for (let i = 0; i < 24; i++) {
 //     console.log(rotate(i, xexe));
 // }
