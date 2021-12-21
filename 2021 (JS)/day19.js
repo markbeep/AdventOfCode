@@ -5,7 +5,7 @@ require('fs').readFile("day19.txt", "utf-8", function(err, data) {
     main(inp);
 });
 
-const MATCHES_REQ = 3;
+const MATCHES_REQ = 6;
 
 class Scanner {
     x;
@@ -47,8 +47,7 @@ const rotations = [
 
 function compare(scanner1, scanner2) {
     let maps;
-    let finalMap;
-    outer: for (let i = 0; i < scanner1.length; i++) {
+    for (let i = 0; i < scanner1.length; i++) {
         for (let j = 0; j < scanner2.length; j++) {
             let p1 = scanner1[i];
             let p2 = scanner2[j];
@@ -62,21 +61,30 @@ function compare(scanner1, scanner2) {
                         if (res) c++;
                     }
                 }
+                if (c >= 2) console.log(maps[k], c);
                 if (c >= MATCHES_REQ) {
-                    finalMap = maps[k];
-                    break outer;
+                    return maps[k];
                 }
             }
         }
     }
-    return finalMap;
+    return null;
     
 }
 
-// returns if the coord is too far from the scanner, so we can ignore it
-function isFar(scanner, coord, mapping) {
-
-}
+// function gen(c1, c2) {
+//     let l = [];
+//     let a = [];
+//     for (let i = 0; i < 3; i++) {
+//         for (let j = 0; j < 3; j++) {
+//             for (let k = 0; k < 3; k++) {
+//                 if (j == i || j == k || i == k) continue;
+//                 let st = `${i}-${}-${}`;
+//             }
+//         }
+//     }
+//     l.push({x: })
+// }
 
 function genMapping(c1, c2) {
     let l = [];
@@ -112,7 +120,6 @@ function genMapping(c1, c2) {
     return l;
 }
 
-// bruteforce all combinations
 function test(c1, c2, m={x:0, y:0, z:0}) {
     // console.log(c1, c2);
     return (c1[0] === c2[0] + m.x
