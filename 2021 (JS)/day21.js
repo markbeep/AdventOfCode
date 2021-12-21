@@ -7,35 +7,36 @@ function main(p1, p2) {
     t1(p1, p2);
     
     rec(0, 0, p1, p2, 0, 0);
-    console.log(dp[0][0][0][0]);
-
+    console.log("Task 2:", Math.max(...dp[0][0][p1-1][p2-1][0]));
 }
 
-let vis = [new Array(100).fill().map(_=> new Array(22).fill().map(_ => new Array(22).fill(false))), new Array(100).fill().map(_=> new Array(22).fill().map(_ => new Array(22).fill(false)))];
-let dp = [new Array(100).fill().map(_=>new Array(22).fill().map(_ => new Array(22).fill([0,0]))), new Array(100).fill().map(_=>new Array(22).fill().map(_ => new Array(22).fill([0,0])))];
+let dp = new Array(21).fill().map(_=>new Array(21).fill().map(_=>new Array(10).fill().map(_=>new Array(10).fill().map(_=>new Array(20).fill(-1)))));
 
 function rec(a, b, p1, p2, t, player) {
     if (a >= 21 || b >= 21) {
         if (a > b) return [1, 0];
         return [0, 1];
     }
-    if (vis[player][t][a][b]) return dp[player][t][a][b];
+    let save = dp[a][b][p1-1][p2-1];
+    if (save[t] !== -1) return save[t];
     let kek = [0,0];
     for (let i = 1; i <= 3; i++) {
         for (let j = 1; j <= 3; j++) {
             for (let k = 1; k <= 3; k++) {
-                let n1 = (p1+i+j+k-1)%10+1;
-                let n2 = (p2+i+j+k-1)%10+1;
                 let res;
-                if (player === 0) res = rec(a+n1, b, n1, p2, t+1, 1);
-                if (player === 1) res = rec(a, b+n2, p1, n2, t+1, 0);
+                if (player === 0) {
+                    let n1 = (p1+i+j+k-1)%10+1;
+                    res = rec(a+n1, b, n1, p2, t+1, 1);
+                } else {
+                    let n2 = (p2+i+j+k-1)%10+1;
+                    res = rec(a, b+n2, p1, n2, t+1, 0);
+                }
                 kek[0] += res[0];
                 kek[1] += res[1];
             }
         }
     }
-    dp[player][t][a][b] = kek;
-    vis[player][t][a][b] = true;
+    save[t] = kek;
     return kek;
 }
 
