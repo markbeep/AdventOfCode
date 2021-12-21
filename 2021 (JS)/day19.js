@@ -30,6 +30,7 @@ function main(scanners) {
             scans[j].z = scans[i].z + m.z;
         }
     }
+    console.log("Result");
     console.table(scans);
 }
 
@@ -52,20 +53,18 @@ function compare(scanner1, scanner2) {
             let p1 = scanner1[i];
             let p2 = scanner2[j];
             maps = genMapping(p1, p2);
-            // console.table(maps);
+            console.table(maps);
             for (let k = 0; k < maps.length; k++) {
-                for (let r = 0; r < rotations.length; r++) {
-                    let c = 0;
-                    for (let a = 0; a < scanner1.length; a++) {
-                        for (let b = 0; b < scanner2.length; b++) {
-                            let res = test(scanner1[a], scanner2[b], maps[k], rotations[r]);
-                            if (res) c++;
-                        }
+                let c = 0;
+                for (let a = 0; a < scanner1.length; a++) {
+                    for (let b = 0; b < scanner2.length; b++) {
+                        let res = test(scanner1[a], scanner2[b], maps[k]);
+                        if (res) c++;
                     }
-                    if (c >= MATCHES_REQ) {
-                        finalMap = maps[k];
-                        break outer;
-                    }
+                }
+                if (c >= MATCHES_REQ) {
+                    finalMap = maps[k];
+                    break outer;
                 }
             }
         }
@@ -84,50 +83,39 @@ function genMapping(c1, c2) {
     let p1 = [];
     let p2 = [];
     // all possible directions
+    let a1 = [], a2 = []; // added
     for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
             for (let k = 0; k < 3; k++) {
                 if (j == i || j == k || i == k) continue;
-                p1.push([c1[i], c1[j], c1[k]]);
-                p2.push([c2[i], c2[j], c2[k]]);
+                let w1 = [c1[i], c1[j], c1[k]];
+                if (!a1.includes(w1.join(","))) {
+                    a1.push(w1.join(","));
+                    p1.push(w1);
+                }
+                let w2 = [c2[i], c2[j], c2[k]]
+                if (!a2.includes(w2.join(","))) {
+                    a2.push(w2.join(","));
+                    p2.push(w2);
+                }
             }
         }
     }
     for (let i = 0; i < p1.length; i++) {
         for (let j = 0; j < p2.length; j++) {
-            // 0 0 0
-            l.push({x: p1[i][0]-p2[j][0], y: p1[i][1]-p2[j][1], z: p1[i][2]-p2[j][2]});
-            l.push({x: p1[i][0]-p2[j][0], y: p1[i][1]-p2[j][1], z: p1[i][2]+p2[j][2]});
-            l.push({x: p1[i][0]-p2[j][0], y: p1[i][1]+p2[j][1], z: p1[i][2]-p2[j][2]});
-            l.push({x: p1[i][0]-p2[j][0], y: p1[i][1]+p2[j][1], z: p1[i][2]+p2[j][2]});
-            l.push({x: p1[i][0]+p2[j][0], y: p1[i][1]-p2[j][1], z: p1[i][2]-p2[j][2]});
-            l.push({x: p1[i][0]+p2[j][0], y: p1[i][1]-p2[j][1], z: p1[i][2]+p2[j][2]});
-            l.push({x: p1[i][0]+p2[j][0], y: p1[i][1]+p2[j][1], z: p1[i][2]-p2[j][2]});
-            l.push({x: p1[i][0]+p2[j][0], y: p1[i][1]+p2[j][1], z: p1[i][2]+p2[j][2]});
-            // 0 0 1
-            // l.push({x: p1[i][0]-p2[j][0], y: p1[i][1]-p2[j][1], z: p2[j][2]-p1[i][2]});
-            // // 0 1 0
-            // l.push({x: p1[i][0]-p2[j][0], y: p2[j][1]-p1[i][1], z: p1[i][2]-p2[j][2]});
-            // // 0 1 1
-            // l.push({x: p1[i][0]-p2[j][0], y: p2[j][1]-p1[i][1], z: p2[j][2]-p1[i][2]});
-            // // 1 0 0s
-            // l.push({x: p2[j][0]-p1[i][0], y: p1[i][1]-p2[j][1], z: p1[i][2]-p2[j][2]});
-            // // 1 0 1
-            // l.push({x: p2[j][0]-p1[i][0], y: p1[i][1]-p2[j][1], z: p2[j][2]-p1[i][2]});
-            // // 1 1 0
-            // l.push({x: p2[j][0]-p1[i][0], y: p2[j][1]-p1[i][1], z: p1[i][2]-p2[j][2]});
-            // // 1 1 1
-            // l.push({x: p2[j][0]-p1[i][0], y: p2[j][1]-p1[i][1], z: p2[j][2]-p1[i][2]});
+            for (let k = 0; k < rotations.length; k++) {
+                let r = rotations[k];
+                l.push({x: p1[i][0]-p2[j][0] * r.x, y: p1[i][1]-p2[j][1] * r.y, z: p1[i][2]-p2[j][2] * r.z });
+            }
         }
     }
-    
     return l;
 }
 
 // bruteforce all combinations
-function test(c1, c2, m={x:0, y:0, z:0}, rot={x:1, y:1, z:1}) {
+function test(c1, c2, m={x:0, y:0, z:0}) {
     // console.log(c1, c2);
-    return (c1[0] === rot.x * c2[0] + m.x
-        && c1[1] === rot.y * c2[1] + m.y
-        && c1[2] === rot.z * c2[2] + m.z);
+    return (c1[0] === c2[0] + m.x
+        && c1[1] === c2[1] + m.y
+        && c1[2] === c2[2] + m.z);
 }
