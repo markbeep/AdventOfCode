@@ -12,6 +12,7 @@ require("fs").readFile("day22.txt", "utf-8", function(err, data) {
 function main(t) {
     console.log("Task 1:", bruteforce(t));
     console.table(t);
+    console.log(intersect(t[0], t[3]));
 }
 
 function covered(t, ind) {
@@ -22,37 +23,25 @@ function covered(t, ind) {
     }
 }
 
-// subtracts c2 from c1 (both should be the same state "on/off")
-function subtraction(c1, c2) {
-    let x1 = t[i].map(e=>e);
-    let x2 = t[i].map(e=>e);
-    let y1 = t[i].map(e=>e);
-    let y2 = t[i].map(e=>e);
-    let z1 = t[i].map(e=>e);
-    let z2 = t[i].map(e=>e);
+function isIntersection(c1, c2) {
+    if (!(c1[0] <= c2[1])) return false;
+    if (!(c1[1] >= c2[0])) return false;
+    if (!(c1[2] <= c2[3])) return false;
+    if (!(c1[3] >= c2[2])) return false;
+    if (!(c1[4] <= c2[5])) return false;
+    if (!(c1[5] >= c2[4])) return false;
+    return true;
+}
 
-    let diff = c2[0]-c1[0]  // if diff is pos, c1 is bigger in this direction
-    if (diff > 0) {
-        x1[0] = c2[0];
-        x1[1] = c1[0]-1;
-    }
-    // x2 should be 13..13 11..13 11..13
-    diff = c1[1]-c2[1]  // if diff is pos, c1 is bigger
-    if (diff > 0) {
-        x2[0] = c1[0]+1;
-        x2[1] = c2[0];
-    }
-    diff = c2[2]-c1[2]  // if diff is pos, c1 is bigger in this direction
-    if (diff > 0) {
-        y1[2] = c2[2];
-        y1[3] = c1[2]-1;
-    }
-    // x2 should be 13..13 11..13 11..13
-    diff = c1[3]-c2[3]  // if diff is pos, c1 is bigger
-    if (diff > 0) {
-        y2[2] = c1[2]+1;
-        y2[3] = c2[2];
-    }
+function intersect(c1, c2) {
+    // calc C
+    let x1 = Math.max(c1[0], c2[0]);
+    let x2 = Math.min(c1[1], c2[1]);
+    let y1 = Math.max(c1[2], c2[2]);
+    let y2 = Math.min(c1[3], c2[3]);
+    let z1 = Math.max(c1[4], c2[4]);
+    let z2 = Math.min(c1[5], c2[5]);
+    
 
     
 
