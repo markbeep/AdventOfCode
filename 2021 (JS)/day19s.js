@@ -8,8 +8,9 @@ class Scanner {
     x = null;
     y = null;
     z = null;
-    constructor(coords) {
+    constructor(coords, id) {
         this.points = coords;
+        this.id = id;
     }
 }
 
@@ -19,12 +20,23 @@ function main(inp) {
     // create all scanners
     let scans = [];
     for (let i = 0; i < inp.length; i++) {
-        scans.push(new Scanner(inp[i]));
+        scans.push(new Scanner(inp[i], i));
     }
 
     scans[0].x = 0;
     scans[0].y = 0;
     scans[0].z = 0;
+
+
+    let c = 0;
+    // console.log(isMap([]))
+    for (let i = 0; i < scans[0].points.length; i++) {
+        for (let j = 0; j < scans[1].points.length; j++) {
+            if (isMap(scans[0].points[i], scans[1].points[j], { x: -20, y: -1133, z: 1061 }, 39)) c++;;
+        }
+    }
+    console.log(c);
+
     let scannersLocated = 0;
     // go through all scanner pairs
     for (let i = 0; i < scans.length; i++) {
@@ -33,14 +45,14 @@ function main(inp) {
             if (j === i) continue;
             if (scans[j].x != null) continue;
             let mp = findCorrectMapping(scans[i], scans[j]);
-            // console.log("Found Mapping:", mp, "| i:",i,"j:",j);
+            console.log("Found Mapping:", mp, "| i:",i,"j:",j);
             if (mp != null) {
                 let [rotation, offset, matches] = mp;
+                // console.log("\tMatches:",matches);
                 scans[j].x = scans[i].x + offset.x;
                 scans[j].y = scans[i].y + offset.y;
                 scans[j].z = scans[i].z + offset.z;
                 console.log("Scanner:", j, ":", scans[j].x, scans[j].y, scans[j].z);
-                console.log("\tMatches:",matches);
             }
         }
     }
@@ -53,18 +65,23 @@ function findCorrectMapping(s1, s2) {
     let m = REQ_MATCHES-1;
     let top = null;
     for (let i = 0; i < maps.length; i++) {
-        let [rotation, mp] = maps[i];
+        let [rotation, offset] = maps[i];
         let matches = 0;
+        let kek = [];
         for (let j = 0; j < s1.points.length; j++) {
             for (let k = 0; k < s2.points.length; k++) {
-                if (isMap(s1.points[j], s2.points[k], mp, rotation)) {
+                if (isMap(s1.points[j], s2.points[k], offset, rotation)) {
                     matches++;
+                    kek.push(move(rotate(rotation, {x:s2.points[k][0], y:s2.points[k][1], z:s2.points[k][2]}), offset));
                 }
             }
         }
         if (matches > m) {
             m = matches;
             top = maps[i];
+            if (s1.id === 0 && s2.id === 1) {
+                console.table(kek);
+            }
         }
     }
     return (top==null)?null:[...top, m];
@@ -79,13 +96,21 @@ function isIn(res, mp, rot) {
     return false;
 }
 
+function move(mp, offset) {
+    let m = {x:mp.x, y:mp.y, z:mp.z}
+    m.x += offset.x;
+    m.y += offset.y;
+    m.z += offset.z;
+    return m;
+}
+
 function findPossibleMappings(s1, s2) {
     let pos = [];
     for (let j = 0; j < s1.points.length; j++) {
         for (let k = 0; k < s2.points.length; k++) {
             let c1 = s1.points[j];
             let c2 = s2.points[k];
-            for (let i = 0; i < 24; i++) {
+            for (let i = 0; i < 48; i++) {
                 let tmpMap = {x: c2[0], y: c2[1], z: c2[2]};
                 let m = rotate(i, tmpMap);
                 let offset = {x: c1[0]-m.x, y: c1[1]-m.y, z: c1[2]-m.z};
@@ -111,19 +136,33 @@ function isMap(c1, c2, offset={x:0, y:0, z:0}, rotation) {
 }
 
 const rotate = (i,o) => {
-    let x = [
-        [o.x, o.y, o.z], [o.x,-o.z, o.y], [o.x,-o.y,-o.z], [o.x, o.z,-o.y],
-        [o.y, o.z, o.x], [o.y,-o.x, o.z], [o.y,-o.z,-o.x], [o.y, o.x,-o.z],
-        [o.z, o.x, o.y], [o.z,-o.y, o.x], [o.z,-o.x,-o.y], [o.z, o.y,-o.x],
-        [-o.z,-o.y,-o.x], [-o.z, o.x,-o.y], [-o.z, o.y, o.x], [-o.z,-o.x, o.y],
-        [-o.y,-o.x,-o.z], [-o.y, o.z,-o.x], [-o.y, o.x, o.z], [-o.y,-o.z, o.x],
-        [-o.x,-o.z,-o.y], [-o.x, o.y,-o.z], [-o.x, o.z, o.y], [-o.x,-o.y, o.z],
-    ]
-    return {x:x[i][0], y:x[i][1], z:x[i][2]};
-    
+    let m = [
+        [1,1,1],
+        [1,1,-1],
+        [1,-1,1],
+        [1,-1,-1],
+        [-1,1,1],
+        [-1,1,-1],
+        [-1,-1,1],
+        [-1,-1,-1]
+    ];
+    let p = [
+        [0,1,2],
+        [0,2,1],
+        [1,0,2],
+        [1,2,0],
+        [2,0,1],
+        [2,1,0]
+    ];
+    let y = Math.floor(i / 6);  // 0-7
+    let x = i - 6 * y;  // 0-5
+    let qe = [o.x, o.y, o.z];
+    return { x: m[y][0]*qe[p[x][0]], y: m[y][1]*qe[p[x][1]], z: m[y][2]*qe[p[x][2]]};
 }
 
 // let xexe = {x:-1,y:-2,z:-3};
-// for (let i = 0; i < 24; i++) {
+// for (let i = 0; i < 48; i++) {
 //     console.log(rotate(i, xexe));
 // }
+
+// 39 => [-1,-1,1] & [1,2,0]=>[y,z,x]
