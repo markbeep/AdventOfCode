@@ -13,18 +13,28 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	var c int = 0
 	content := strings.Split(string(f), "\n")
-
-	for i := range content {
-		if i == 0 {
-			continue
-		}
-		a, _ := strconv.Atoi(content[i])
-		b, _ := strconv.Atoi(content[i-1])
-		if a > b {
-			c += 1
+	m1 := 0
+	m2 := 0
+	m3 := 0
+	t := 0
+	for _, v := range content {
+		if v != "" {
+			a, _ := strconv.Atoi(v)
+			t += a
+		} else {
+			if t > m1 {
+				m3 = m2
+				m2 = m1
+				m1 = t
+			} else if t > m2 {
+				m3 = m2
+				m2 = t
+			} else if t > m3 {
+				m3 = t
+			}
+			t = 0
 		}
 	}
-	fmt.Print(c)
+	fmt.Print(m1 + m2 + m3)
 }
