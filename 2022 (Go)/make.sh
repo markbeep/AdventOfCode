@@ -1,5 +1,6 @@
 #!/bin/bash
 
-mkdir $1 -p
-touch $1/inp.txt
-cp template.go $1/$1.go -n 
+padded=$(printf "%02d" $1)
+mkdir $padded -p
+touch $padded/inp.txt
+cp template.go $padded/$padded.go -n 
