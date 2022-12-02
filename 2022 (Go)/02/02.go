@@ -14,39 +14,16 @@ func main() {
 	}
 	var c int = 0
 	content := strings.Split(strings.Trim(string(f), " \n"), "\n")
-
 	for _, v := range content {
-		t := strings.Split(v, " ")
-		switch t[1] {
-		case "X":
-			switch t[0] {
-			case "A":
-				c += 3
-			case "B":
-				c += 1
-			case "C":
-				c += 2
-			}
-		case "Y":
-			c += 3
-			switch t[0] {
-			case "A":
-				c += 1
-			case "B":
-				c += 2
-			case "C":
-				c += 3
-			}
-		case "Z":
-			c += 6
-			switch t[0] {
-			case "A":
-				c += 2
-			case "B":
-				c += 3
-			case "C":
-				c += 1
-			}
+		t := []rune(v)
+		l := int(t[0] - 65)
+		switch t[2] - 88 {
+		case 0:
+			c += (l+2)%3 + 1
+		case 1:
+			c += l + 4
+		case 2:
+			c += (l+1)%3 + 7
 		}
 	}
 	fmt.Println(c)
