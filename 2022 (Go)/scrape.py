@@ -16,7 +16,7 @@ def fetch(day: int):
         cookies={"session": SESSION_KEY},
         headers=HEADERS)
     try:
-        with open(f"{day}/inp.txt", "w") as f:
+        with open(f"{str(day).zfill(2)}/inp.txt", "w") as f:
             f.write(r.text)
     except FileNotFoundError:
         print("Day folder doesn't exist")
