@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"regexp"
 	"strings"
 )
 
@@ -17,14 +16,12 @@ func main() {
 	}
 	cont := strings.Split(strings.Trim(string(f), " \n"), "\n")
 	c := 0
-	re := regexp.MustCompile(`(\w+)`)
-	var mat [][]string // group matches. mat[0][1] is the actual captured word
 
 	for _, v := range cont {
-		mat = re.FindAllStringSubmatch(v, -1)
+		fmt.Sscanf(v, "")
+
 	}
 
 	_ = cont
-	_ = mat
 	fmt.Println(c)
 }
