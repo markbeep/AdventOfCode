@@ -18,22 +18,13 @@ func main() {
 	lines := 0
 	hash := map[int][]rune{}
 	for j, v := range cont {
-		if len(v) <= 1 {
-			lines = j
+		if v[1] == '1' {
+			lines = j + 1
 			break
 		}
-		for i, ch := range v {
-			if ch == '1' {
-				break
-			}
-			ind := -1
-			if i < 4 && i == 1 {
-				ind = 0
-			} else if i > 4 && i%4 == 1 {
-				ind = i / 4
-			}
-			if ind >= 0 && !(ch == '[' || ch == ']' || ch == ' ') {
-				hash[ind] = append(hash[ind], ch)
+		for i := 1; i < len(v); i += 4 {
+			if v[i] != ' ' {
+				hash[i/4] = append(hash[i/4], rune(v[i]))
 			}
 		}
 	}
@@ -55,12 +46,13 @@ func main() {
 			break
 		}
 		fmt.Sscanf(v, "move %d from %d to %d", &k1, &k2, &k3)
-
+		// task 1
 		for i := 0; i < k1; i++ {
 			last := t1[k2-1][len(t1[k2-1])-1]
 			t1[k2-1] = t1[k2-1][:len(t1[k2-1])-1]
 			t1[k3-1] = append(t1[k3-1], last)
 		}
+		// task 2
 		p := len(t2[k2-1])
 		slice := t2[k2-1][p-k1:]
 		t2[k2-1] = t2[k2-1][:p-k1]
