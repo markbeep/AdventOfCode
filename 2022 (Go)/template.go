@@ -7,8 +7,6 @@ import (
 	"strings"
 )
 
-var hash = map[string]bool{}
-
 func main() {
 	f, err := os.ReadFile("inp.txt")
 	if err != nil {
@@ -16,6 +14,7 @@ func main() {
 	}
 	cont := strings.Split(strings.Trim(string(f), " \n"), "\n")
 	c := 0
+	hash := map[string]bool{}
 
 	for _, v := range cont {
 		fmt.Sscanf(v, "")
@@ -23,5 +22,19 @@ func main() {
 	}
 
 	_ = cont
+	_ = hash
 	fmt.Println(c)
+}
+
+type node[T any] struct {
+	val T
+	sub []node[T]
+}
+
+func create[T any](val T) node[T] {
+	return node[T]{val: val, sub: []node[T]{}}
+}
+
+func (n *node[T]) add(val T) {
+	n.sub = append(n.sub, create(val))
 }
