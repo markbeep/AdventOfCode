@@ -3,12 +3,16 @@ Fetches the input data for the given day or simply today and throws it
 in the folder
 """
 
+import os
 import requests, sys
 from datetime import datetime
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # cookie session key
-SESSION_KEY = "53616c7465645f5f22342b2890cce3b49cc607014daee0af67abbd7fd427651a4706773d32654d42a1e9c7673161f68f8b0c7a2e5d5e4bc2e62dad851071e58a"
-HEADERS = {"User-Agent": "Fetch tool"}
+SESSION_KEY = os.getenv("SESSION")
+HEADERS = {"User-Agent": f"Fetch tool by {os.getenv('EMAIL', 'n/a')}"}
 
 def fetch(day: int):
     r = requests.get(
