@@ -11,10 +11,11 @@ func main() {
 	start := time.Now()
 	f, _ := os.ReadFile("inp.txt")
 	cont := strings.Trim(string(f), " \n")
-	ch := make(chan int, 2)
-	go ff(4, cont, ch)
-	go ff(14, cont, ch)
-	fmt.Printf("P1: %d\nP2: %d\n", <-ch, <-ch)
+	ch1 := make(chan int)
+	ch2 := make(chan int)
+	go ff(4, cont, ch1)
+	go ff(14, cont, ch2)
+	fmt.Printf("P1: %d\nP2: %d\n", <-ch1, <-ch2)
 	fmt.Println("Took:", time.Since(start))
 }
 
