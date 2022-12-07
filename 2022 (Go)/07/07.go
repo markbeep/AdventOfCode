@@ -12,11 +12,10 @@ var total = 0
 var spaces []int
 
 func main() {
+	start := time.Now()
 	f, _ := os.ReadFile("inp.txt")
 	cont := strings.Split(strings.Trim(string(f), " \n"), "\n")
-	start := time.Now()
 	root := buildTree(cont) // builds tree
-	fmt.Println("Time:", time.Since(start))
 	ch := make(chan int, 1)
 	dfs(root, ch) // finds total root folder size
 	tot := <-ch
@@ -28,6 +27,7 @@ func main() {
 			break
 		}
 	}
+	fmt.Println("Time:", time.Since(start))
 }
 
 func dfs(n *node, ch chan int) {
