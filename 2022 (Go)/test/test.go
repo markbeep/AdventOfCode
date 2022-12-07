@@ -12,13 +12,17 @@ func main() {
 
 type node[T any] struct {
 	val T
-	sub []node[T]
+	sub []*node[T]
+	par *node[T]
 }
 
 func create[T any](val T) node[T] {
-	return node[T]{val: val, sub: []node[T]{}}
+	return node[T]{val: val, sub: []*node[T]{}}
 }
 
-func (n *node[T]) add(val T) {
-	n.sub = append(n.sub, create(val))
+func (n *node[T]) add(val T) node[T] {
+	c := create(val)
+	c.par = n
+	n.sub = append(n.sub, &c)
+	return c
 }
