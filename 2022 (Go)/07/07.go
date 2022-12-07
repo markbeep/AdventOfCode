@@ -62,7 +62,7 @@ func buildTree(cont []string) *node {
 			} else {
 				cur = cur.add(name, 0, true)
 			}
-		} else if cont[i][2:4] == "ls" {
+		} else { // ls
 			for i+1 < len(cont) && cont[i+1][0] != '$' {
 				i++
 				if cont[i][0] == 'd' {
