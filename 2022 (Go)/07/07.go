@@ -5,6 +5,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 )
 
 var total = 0
@@ -13,7 +14,9 @@ var spaces []int
 func main() {
 	f, _ := os.ReadFile("inp.txt")
 	cont := strings.Split(strings.Trim(string(f), " \n"), "\n")
+	start := time.Now()
 	root := buildTree(cont) // builds tree
+	fmt.Println("Time:", time.Since(start))
 	ch := make(chan int, 1)
 	dfs(root, ch) // finds total root folder size
 	tot := <-ch
@@ -22,7 +25,7 @@ func main() {
 	for _, v := range spaces {
 		if v > tot-40000000 {
 			fmt.Println("Part 2:", v)
-			return
+			break
 		}
 	}
 }
@@ -50,37 +53,27 @@ func dfs(n *node, ch chan int) {
 func buildTree(cont []string) *node {
 	root := &node{name: "/", dir: true, sub: map[string]*node{}}
 	cur := root
-parser:
-	for i := 0; i < len(cont[1:]); {
+	for i := 0; i < len(cont[1:]); i++ {
+		var name string
 		if cont[i][2:4] == "cd" {
-			var name string
 			fmt.Sscanf(cont[i], "$ cd %s", &name)
 			if name == ".." {
 				cur = cur.par
-				i++
-				continue parser
+			} else {
+				cur = cur.add(name, 0, true)
 			}
-			cur = cur.add(name, 0, true)
-			i++
-			continue parser
-		}
-		if cont[i][2:4] == "ls" {
-			i++
-			for i < len(cont) && cont[i][0] != '$' {
+		} else if cont[i][2:4] == "ls" {
+			for i+1 < len(cont) && cont[i+1][0] != '$' {
+				i++
 				if cont[i][0] == 'd' {
-					var name string
 					fmt.Sscanf(cont[i], "dir %s", &name)
 					cur.add(name, 0, true)
 				} else {
-					var name string
 					var val int
 					fmt.Sscanf(cont[i], "%d %s", &val, &name)
 					cur.add(name, val, false)
 				}
-				i++
-				continue
 			}
-			continue parser
 		}
 	}
 	return root
