@@ -53,27 +53,24 @@ func dfs(n *node, ch chan int) {
 func buildTree(cont []string) *node {
 	root := &node{name: "/", dir: true, sub: map[string]*node{}}
 	cur := root
-	for i := 0; i < len(cont[1:]); i++ {
+	for _, v := range cont[1:] {
 		var name string
-		if cont[i][2:4] == "cd" {
-			fmt.Sscanf(cont[i], "$ cd %s", &name)
+		var val int
+		switch v[2] {
+		case 'c': // cd
+			fmt.Sscanf(v, "$ cd %s", &name)
 			if name == ".." {
 				cur = cur.par
 			} else {
 				cur = cur.add(name, 0, true)
 			}
-		} else { // ls
-			for i+1 < len(cont) && cont[i+1][0] != '$' {
-				i++
-				if cont[i][0] == 'd' {
-					fmt.Sscanf(cont[i], "dir %s", &name)
-					cur.add(name, 0, true)
-				} else {
-					var val int
-					fmt.Sscanf(cont[i], "%d %s", &val, &name)
-					cur.add(name, val, false)
-				}
-			}
+		case 'l': // ls
+		case 'r': // dir
+			fmt.Sscanf(v, "dir %s", &name)
+			cur.add(name, 0, true)
+		default:
+			fmt.Sscanf(v, "%d %s", &val, &name)
+			cur.add(name, val, false)
 		}
 	}
 	return root
