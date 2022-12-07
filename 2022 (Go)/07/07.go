@@ -4,10 +4,13 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sort"
 	"strings"
 )
 
-var total int = 0
+var total = 0
+var free_space = 0
+var spaces []int
 
 func main() {
 	f, err := os.ReadFile("inp.txt")
@@ -16,29 +19,33 @@ func main() {
 	}
 	cont := strings.Split(strings.Trim(string(f), " \n"), "\n")
 	root := buildTree(cont)
-	fmt.Println(dfs(root))
-	fmt.Println(total)
+	tot := dfs(root)
+	fmt.Println("Part 1:", total)
+	free_space = tot - 40000000
+	dfs(root)
+	sort.Ints(spaces)
+	fmt.Println("Part 2:", spaces[0])
 }
 
-func dfs(n *node) (int, int) {
+func dfs(n *node) int {
 	if !n.dir {
 		if n.val <= 100_000 {
-			return n.val, n.val
+			return n.val
 		}
-		return 0, n.val
+		return n.val
 	}
-	c := 0
 	tot := 0
 	for _, v := range n.sub {
-		val, tot_b := dfs(v)
-		tot += tot_b
-		c += val
+		t := dfs(v)
+		tot += t
 	}
 	if tot <= 100_000 {
-		c += tot
 		total += tot
 	}
-	return c, tot
+	if free_space > 0 && tot >= free_space {
+		spaces = append(spaces, tot)
+	}
+	return tot
 }
 
 func buildTree(cont []string) *node {
@@ -81,14 +88,15 @@ parser:
 }
 
 type node struct {
-	val int
-	dir bool
-	sub map[string]*node
-	par *node
+	name string
+	val  int
+	dir  bool
+	sub  map[string]*node
+	par  *node
 }
 
 func create(name string, val int, dir bool) *node {
-	return &node{val: val, sub: map[string]*node{}, dir: dir}
+	return &node{name: name, val: val, sub: map[string]*node{}, dir: dir}
 }
 
 func (n *node) add(name string, val int, dir bool) *node {
