@@ -2,54 +2,53 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"sort"
 	"strings"
 )
 
 var total = 0
-var free_space = 0
 var spaces []int
 
 func main() {
-	f, err := os.ReadFile("inp.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
+	f, _ := os.ReadFile("inp.txt")
 	cont := strings.Split(strings.Trim(string(f), " \n"), "\n")
-	root := buildTree(cont)
-	tot := dfs(root)
+	root := buildTree(cont) // builds tree
+	ch := make(chan int, 1)
+	dfs(root, ch) // finds total root folder size
+	tot := <-ch
 	fmt.Println("Part 1:", total)
-	free_space = tot - 40000000
-	dfs(root)
 	sort.Ints(spaces)
-	fmt.Println("Part 2:", spaces[0])
+	for _, v := range spaces {
+		if v > tot-40000000 {
+			fmt.Println("Part 2:", v)
+			return
+		}
+	}
 }
 
-func dfs(n *node) int {
+func dfs(n *node, ch chan int) {
 	if !n.dir {
-		if n.val <= 100_000 {
-			return n.val
-		}
-		return n.val
+		ch <- n.val
+		return
 	}
 	tot := 0
+	sch := make(chan int, len(n.sub))
 	for _, v := range n.sub {
-		t := dfs(v)
-		tot += t
+		dfs(v, sch)
+	}
+	for range n.sub {
+		tot += <-sch
 	}
 	if tot <= 100_000 {
 		total += tot
 	}
-	if free_space > 0 && tot >= free_space {
-		spaces = append(spaces, tot)
-	}
-	return tot
+	spaces = append(spaces, tot)
+	ch <- tot
 }
 
 func buildTree(cont []string) *node {
-	root := create("/", 0, true)
+	root := &node{name: "/", dir: true, sub: map[string]*node{}}
 	cur := root
 parser:
 	for i := 0; i < len(cont[1:]); {
@@ -95,15 +94,11 @@ type node struct {
 	par  *node
 }
 
-func create(name string, val int, dir bool) *node {
-	return &node{name: name, val: val, sub: map[string]*node{}, dir: dir}
-}
-
 func (n *node) add(name string, val int, dir bool) *node {
 	if n.sub[name] != nil {
 		return n.sub[name]
 	}
-	c := create(name, val, dir)
+	c := &node{name: name, val: val, sub: map[string]*node{}, dir: dir}
 	c.par = n
 	n.sub[name] = c
 	return c
