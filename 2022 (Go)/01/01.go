@@ -38,6 +38,7 @@ func main() {
 			t = 0
 		}
 	}
-	fmt.Println(m1 + m2 + m3)
+	fmt.Println("Part 1:", m1)
+	fmt.Println("Part 2:", m1+m2+m3)
 	fmt.Println("Took:", time.Since(start))
 }
