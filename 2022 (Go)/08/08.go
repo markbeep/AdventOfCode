@@ -2,29 +2,47 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"strings"
 	"time"
 )
 
+type tree struct {
+	l   int
+	r   int
+	t   int
+	b   int
+	vis bool
+}
+
 func main() {
 	start := time.Now()
-	f, err := os.ReadFile("inp.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
+	f, _ := os.ReadFile("inp.txt")
 	cont := strings.Split(strings.Trim(string(f), " \n"), "\n")
-	var c, m int
+	cch := make(chan int, len(cont))
+	mch := make(chan int, len(cont))
 	for i := range cont {
-		for j := range cont[i] {
-			l, r, t, b, see := check(cont, i, j)
-			if see {
-				c++
+		go func(i int, cch, mch chan int) {
+			var c, m int
+			for j := range cont[i] {
+				l, r, t, b, vis := check(cont, i, j)
+				if vis {
+					c++
+				}
+				if l*r*t*b > m {
+					m = l * r * t * b
+				}
 			}
-			if l*r*t*b > m {
-				m = l * r * t * b
-			}
+			cch <- c
+			mch <- m
+		}(i, cch, mch)
+	}
+	var c, m int
+	for range cont {
+		c += <-cch
+		v := <-mch
+		if v > m {
+			m = v
 		}
 	}
 	fmt.Println(c, m)
