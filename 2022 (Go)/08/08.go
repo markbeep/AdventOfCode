@@ -24,14 +24,56 @@ func main() {
 		}
 	}
 
+	m := 0
 	for i := range trees {
 		for j := range trees[i] {
 			if check(trees, i, j) {
 				c += 1
 			}
+			val := check2(trees, i, j)
+			if val > m {
+				m = val
+			}
 		}
 	}
-	fmt.Println(c)
+	fmt.Println(c, m)
+}
+
+func check2(vis [][]int, x, y int) int {
+	top := 0
+	bot := 0
+	l := 0
+	r := 0
+
+	// top down
+	for i := y - 1; i >= 0; i-- {
+		if vis[i][x] >= vis[y][x] || i == 0 {
+			top = y - i
+			break
+		}
+	}
+	// bottom
+	for i := y + 1; i < len(vis); i++ {
+		if vis[i][x] >= vis[y][x] || i == len(vis)-1 {
+			bot = i - y
+			break
+		}
+	}
+	// left
+	for i := x - 1; i >= 0; i-- {
+		if vis[y][i] >= vis[y][x] || i == 0 {
+			l = x - i
+			break
+		}
+	}
+	// right
+	for i := x + 1; i < len(vis[0]); i++ {
+		if vis[y][i] >= vis[y][x] || i == len(vis[0])-1 {
+			r = i - x
+			break
+		}
+	}
+	return l * r * top * bot
 }
 
 func check(vis [][]int, x, y int) bool {
