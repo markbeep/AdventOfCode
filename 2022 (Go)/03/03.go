@@ -4,11 +4,14 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
+	start := time.Now()
 	part1()
 	part2()
+	fmt.Println("Took:", time.Since(start))
 }
 
 var f, _ = os.ReadFile("inp.txt")

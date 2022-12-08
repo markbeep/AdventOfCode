@@ -5,9 +5,11 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 func main() {
+	start := time.Now()
 	f, err := os.ReadFile("inp.txt")
 	if err != nil {
 		log.Fatal(err)
@@ -27,4 +29,5 @@ func main() {
 		}
 	}
 	fmt.Println(c)
+	fmt.Println("Took:", time.Since(start))
 }
