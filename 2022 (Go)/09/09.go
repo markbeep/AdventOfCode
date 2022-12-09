@@ -32,7 +32,6 @@ func main() {
 			case 'D':
 				knots[0] = Point{knots[0].x, knots[0].y + 1}
 			}
-			heads[knots[0]] = true
 			for j := 1; j < len(knots); j++ {
 				horiz := abs(knots[j-1].x - knots[j].x)
 				vert := abs(knots[j-1].y - knots[j].y)
