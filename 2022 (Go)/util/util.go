@@ -1,0 +1,21 @@
+package util
+
+import (
+	"log"
+	"os"
+	"strings"
+)
+
+// Read in a file and trim spaces and newlines
+func Read(fp string) string {
+	f, err := os.ReadFile(fp)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return strings.Trim(string(f), " \n\r")
+}
+
+// Read in a file, trim and then split
+func ReadS(fp, split string) []string {
+	return strings.Split(Read(fp), split)
+}
