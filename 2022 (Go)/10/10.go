@@ -3,17 +3,19 @@ package main
 import (
 	"aoc/util"
 	"fmt"
+	"strings"
 )
 
 func main() {
 	f := util.ReadS("inp.txt", "\n")
 	c := 0
-	hash := map[string]bool{}
-
 	queue := make([]int, 1)
+	crt := make([]string, 40)
+	for i := range crt {
+		crt[i] = "."
+	}
 	x := 1
-	i := 0
-	for ; len(queue) > 0; i++ {
+	for i := 0; len(queue) > 0; i++ {
 		po := queue[0]
 		x += po
 		queue = queue[1:]
@@ -25,18 +27,23 @@ func main() {
 			} else {
 				var k int
 				fmt.Sscanf(v, "addx %d", &k)
-				queue = append(queue, 0)
-				queue = append(queue, k)
+				queue = append(queue, 0, k)
 			}
 		}
-		fmt.Println(queue)
+		ind := i % 40
+		crt[ind] = "."
+		if ind >= x-1 && ind <= x+1 {
+			crt[ind] = "#"
+		}
 		if (i-19)%40 == 0 {
-			fmt.Println(i, x)
 			c += (i + 1) * x
 		}
-
+		if (i-39)%40 == 0 {
+			fmt.Println(strings.Join(crt, ""))
+			for i := range crt {
+				crt[i] = "."
+			}
+		}
 	}
-	_ = f
-	_ = hash
-	fmt.Println(x, c)
+	fmt.Println("Part 1:", c)
 }
