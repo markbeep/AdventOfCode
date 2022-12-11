@@ -18,6 +18,11 @@ type monke struct {
 
 func main() {
 	f := util.ReadS("inp.txt", "\n")
+	fmt.Println("Part 1:", aux(3, 20, f))
+	fmt.Println("Part 2:", aux(1, 10_000, f))
+}
+
+func aux(div_by, rounds int, f []string) int {
 	re_start := regexp.MustCompile(`\d+`)
 	re_op := regexp.MustCompile(`([\w\d\*\+]+)`)
 	monkes := map[int]*monke{}
@@ -40,14 +45,18 @@ func main() {
 	for _, v := range monkes {
 		to_div *= v.div
 	}
-	// round
-	for i := 0; i < 10000; i++ {
+	// rounds
+	for i := 0; i < rounds; i++ {
 		for j := 0; j < len(monkes); j++ {
 			v := monkes[j]
 			for len(v.items) > 0 {
 				it := v.items[0]
 				v.items = v.items[1:]
-				it = oop(it, v.op) % to_div
+				if div_by > 1 {
+					it = oop(it, v.op) / div_by
+				} else {
+					it = oop(it, v.op) % to_div / div_by
+				}
 				if it%v.div == 0 {
 					monkes[v.ift].items = append(monkes[v.ift].items, it)
 				} else {
@@ -67,7 +76,7 @@ func main() {
 			m2 = v.c
 		}
 	}
-	fmt.Println(m1, m2, m1*m2)
+	return m1 * m2
 }
 
 func oop(x int, ops []string) int {
