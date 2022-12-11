@@ -36,14 +36,18 @@ func main() {
 		}
 	}
 
+	to_div := 1
+	for _, v := range monkes {
+		to_div *= v.div
+	}
 	// round
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 10000; i++ {
 		for j := 0; j < len(monkes); j++ {
 			v := monkes[j]
 			for len(v.items) > 0 {
 				it := v.items[0]
 				v.items = v.items[1:]
-				it = oop(it, v.op) / 3
+				it = oop(it, v.op) % to_div
 				if it%v.div == 0 {
 					monkes[v.ift].items = append(monkes[v.ift].items, it)
 				} else {
@@ -63,8 +67,7 @@ func main() {
 			m2 = v.c
 		}
 	}
-	fmt.Println(m1 * m2)
-
+	fmt.Println(m1, m2, m1*m2)
 }
 
 func oop(x int, ops []string) int {
