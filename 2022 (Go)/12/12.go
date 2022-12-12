@@ -2,9 +2,7 @@ package main
 
 import (
 	"aoc/util"
-	"aoc/util/ints"
 	"fmt"
-	"math"
 	"strings"
 )
 
@@ -17,35 +15,30 @@ type Point struct {
 func main() {
 	f := util.ReadS("inp.txt", "\n")
 	e := Point{}
-	l := math.MaxInt
-outer:
+	s := Point{}
+	aq := []*Point{&s}
 	for i := range f {
-		v := strings.Index(f[i], "E")
-		if v >= 0 {
-			f[i] = strings.Replace(f[i], "E", "z", 1)
-			e.y = i
-			e.x = v
-			break outer
-		}
-	}
-	for i := range f {
-		for j := range f[i] {
-			if f[i][j] == 'S' || f[i][j] == 'a' {
-				vis := util.Array[bool](len(f), len(f[i]))
+		for j, v := range f[i] {
+			if v == 'E' {
+				f[i] = strings.Replace(f[i], "E", "z", 1)
+				e.y = i
+				e.x = j
+			} else if v == 'S' {
 				f[i] = strings.Replace(f[i], "S", "a", 1)
-				v := bfs(f, j, i, &e, vis)
-				if f[i][j] == 'S' {
-					fmt.Println("Part 1:", v)
-				}
-				l = ints.Min(v, l)
+				s.y = i
+				s.x = j
+			} else if v == 'a' {
+				aq = append(aq, &Point{y: i, x: j})
 			}
 		}
 	}
-	fmt.Println("Part 2:", l)
+	p1 := bfs([]*Point{&s}, f, &e)
+	p2 := bfs(aq, f, &e)
+	fmt.Println("Part 1:", p1, "Part 2:", p2)
 }
 
-func bfs(f []string, sx, sy int, e *Point, vis [][]bool) int {
-	q := []*Point{{x: sx, y: sy}}
+func bfs(q []*Point, f []string, e *Point) int {
+	vis := util.Array[bool](len(f), len(f[0]))
 	for len(q) > 0 {
 		po := q[0]
 		q = q[1:]
@@ -59,7 +52,7 @@ func bfs(f []string, sx, sy int, e *Point, vis [][]bool) int {
 		q = valid(q, f, po.x-1, po.y, po.d+1, cur, vis)
 		q = valid(q, f, po.x, po.y-1, po.d+1, cur, vis)
 	}
-	return math.MaxInt
+	return -1
 }
 
 func valid(q []*Point, f []string, x, y, d int, cur byte, vis [][]bool) []*Point {
