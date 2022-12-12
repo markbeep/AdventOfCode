@@ -19,3 +19,12 @@ func Read(fp string) string {
 func ReadS(fp, split string) []string {
 	return strings.Split(Read(fp), split)
 }
+
+// Makes a 2D array
+func Array[T any](y, x int) [][]T {
+	p := make([][]T, y)
+	for i := range p {
+		p[i] = make([]T, x)
+	}
+	return p
+}
