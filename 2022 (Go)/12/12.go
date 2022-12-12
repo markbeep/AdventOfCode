@@ -7,9 +7,7 @@ import (
 )
 
 type Point struct {
-	x int
-	y int
-	d int
+	x, y, d int
 }
 
 func main() {
@@ -32,27 +30,29 @@ func main() {
 			}
 		}
 	}
-	p1 := bfs([]*Point{&s}, f, &e)
-	p2 := bfs(aq, f, &e)
-	fmt.Println("Part 1:", p1, "Part 2:", p2)
+	p1 := make(chan int, 1)
+	p2 := make(chan int, 1)
+	go bfs([]*Point{&s}, f, &e, p1)
+	go bfs(aq, f, &e, p2)
+	fmt.Println("Part 1:", <-p1, "Part 2:", <-p2)
 }
 
-func bfs(q []*Point, f []string, e *Point) int {
+func bfs(q []*Point, f []string, e *Point, ch chan int) {
 	vis := util.Array[bool](len(f), len(f[0]))
 	for len(q) > 0 {
 		po := q[0]
 		q = q[1:]
 		cur := f[po.y][po.x]
-		vis[po.y][po.x] = true
 		if po.x == e.x && po.y == e.y {
-			return po.d
+			ch <- po.d
+			return
 		}
 		q = valid(q, f, po.x+1, po.y, po.d+1, cur, vis)
 		q = valid(q, f, po.x, po.y+1, po.d+1, cur, vis)
 		q = valid(q, f, po.x-1, po.y, po.d+1, cur, vis)
 		q = valid(q, f, po.x, po.y-1, po.d+1, cur, vis)
 	}
-	return -1
+	ch <- -1
 }
 
 func valid(q []*Point, f []string, x, y, d int, cur byte, vis [][]bool) []*Point {
