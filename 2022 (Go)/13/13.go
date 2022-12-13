@@ -5,6 +5,7 @@ import (
 	"aoc/util/ints"
 	"aoc/util/node"
 	"fmt"
+	"runtime"
 	"strings"
 )
 
@@ -12,21 +13,42 @@ func main() {
 	f := util.ReadS("inp.txt", "\n\n")
 	v1, _ := eval("[[2]]")
 	v2, _ := eval("[[6]]")
+	NUM_ROUTS := ints.Min(runtime.GOMAXPROCS(0), runtime.NumCPU())
+	split := len(f) / NUM_ROUTS
+	ch1 := make(chan int, NUM_ROUTS)
+	ch2 := make(chan int, NUM_ROUTS)
+	ch3 := make(chan int, NUM_ROUTS)
+	for r := 0; r < NUM_ROUTS; r++ {
+		if r < NUM_ROUTS-1 {
+			go calc(f[r*split:(r+1)*split], ch1, ch2, ch3, r*split, v1, v2)
+		} else {
+			go calc(f[r*split:], ch1, ch2, ch3, r*split, v1, v2)
+
+		}
+	}
+	var p1, c1, c2 int
+	for i := 0; i < NUM_ROUTS; i++ {
+		p1 += <-ch1
+		c1 += <-ch2
+		c2 += <-ch3
+	}
+	fmt.Println("Part 1:", p1, "Part 2:", (c1+1)*(c2+2))
+
+}
+
+func calc(f []string, ch1, ch2, ch3 chan<- int, si int, v1, v2 *node.Node[int]) {
 	var p1, c1, c2 int
 	for i, v := range f {
 		s := strings.Split(v, "\n")
 		l, _ := eval(s[0])
 		r, _ := eval(s[1])
-		if comp(l, r) {
-			p1 += i + 1
-		}
-		c1 += ints.BInt(comp(r, v1))
-		c1 += ints.BInt(comp(l, v1))
-		c2 += ints.BInt(comp(l, v2))
-		c2 += ints.BInt(comp(r, v2))
+		p1 += ints.BInt(comp(l, r)) * (i + 1 + si)
+		c1 += ints.BInt(comp(r, v1)) + ints.BInt(comp(l, v1))
+		c2 += ints.BInt(comp(l, v2)) + ints.BInt(comp(r, v2))
 	}
-	fmt.Println("Part 1:", p1, "Part 2:", (c1+1)*(c2+2))
-
+	ch1 <- p1
+	ch2 <- c1
+	ch3 <- c2
 }
 
 func comp(l, r *node.Node[int]) bool {
@@ -62,15 +84,17 @@ func comp_aux(l, r *node.Node[int]) (bool, bool) {
 func eval(s string) (*node.Node[int], int) {
 	n := node.Create(-1)
 	for i := 1; i < len(s); i++ {
-		if s[i] == '[' {
+		switch s[i] {
+		case '[':
 			nn, ind := eval(s[i:])
 			n.Append(nn)
 			i += ind
-		} else if s[i] == ']' {
+		case ']':
 			return n, i
-		} else if s[i] != ',' {
+		case ',':
+		default:
 			// is a number
-			num := ints.SInt(s[i : i+1])
+			num := ints.CInt(s[i])
 			// check if its 10
 			if num == 1 && i < len(s)-1 && s[i+1] == '0' {
 				num = 10

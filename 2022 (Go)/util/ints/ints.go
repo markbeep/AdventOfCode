@@ -60,3 +60,7 @@ func SInt(s string) int {
 	}
 	return i
 }
+
+func CInt(c byte) int {
+	return int(c - '0')
+}
