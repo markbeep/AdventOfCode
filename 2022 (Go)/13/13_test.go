@@ -9,3 +9,6 @@ func BenchmarkRun(b *testing.B) {
 		main()
 	}
 }
+
+func TestComp(t *testing.T) {
+}

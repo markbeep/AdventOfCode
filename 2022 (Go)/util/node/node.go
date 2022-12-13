@@ -17,6 +17,12 @@ func (n *Node[T]) Add(val T) *Node[T] {
 	return c
 }
 
+func (n *Node[T]) Append(o *Node[T]) *Node[T] {
+	n.Sub = append(n.Sub, o)
+	o.Par = n
+	return o
+}
+
 func Bfs[T comparable](q []*Node[T], vis map[*Node[T]]bool, dist map[*Node[T]]int) map[*Node[T]]int {
 	for len(q) > 0 {
 		p := q[0]

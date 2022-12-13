@@ -1,6 +1,10 @@
 package ints
 
-import "math"
+import (
+	"log"
+	"math"
+	"strconv"
+)
 
 func Sgn(x int) int {
 	if x < 0 {
@@ -36,4 +40,23 @@ func Min(a ...int) int {
 		}
 	}
 	return m
+}
+
+func BInt(b bool) int {
+	if b {
+		return 1
+	}
+	return 0
+}
+
+func IBool(i int) bool {
+	return i != 0
+}
+
+func SInt(s string) int {
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return i
 }
