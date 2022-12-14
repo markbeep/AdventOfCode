@@ -12,10 +12,11 @@ func main() {
 	f := util.ReadS("inp.txt", "\n")
 	c := 0
 	re := regexp.MustCompile(`(\d+,\d+)`)
-	field := util.Array2[bool](1000, 1000)
+	field := util.Array2[bool](10000, 10000)
 	minX, maxX, minY, maxY := 999, 0, 999, 0
 	for _, v := range f {
 		p := re.FindAllString(v, -1)
+		var prevX, prevY int
 		for i, coord := range p {
 			tmp := strings.Split(coord, ",")
 			x, y := ints.SInt(tmp[0]), ints.SInt(tmp[1])
@@ -24,32 +25,21 @@ func main() {
 			maxX = ints.Max(maxX, x)
 			maxY = ints.Max(maxY, y)
 			if i == 0 {
+				prevX, prevY = x, y
 				continue
 			}
-			tmp = strings.Split(p[i-1], ",")
-			deltaX := x - ints.SInt(tmp[0])
-			deltaY := y - ints.SInt(tmp[1])
-			curX, curY := ints.SInt(tmp[0]), ints.SInt(tmp[1])
+			deltaX := x - prevX
+			deltaY := y - prevY
+			curX, curY := prevX, prevY
 			for j := 0; j <= ints.Max(ints.Abs(deltaX), ints.Abs(deltaY)); j++ {
 				field[curY][curX] = true
 				curX += ints.Sgn(deltaX)
 				curY += ints.Sgn(deltaY)
 			}
+			prevX, prevY = x, y
 		}
-		fmt.Println(p)
 	}
-	for i := 0; i <= maxY; i++ {
-		for j := minX; j <= maxX; j++ {
-			if field[i][j] {
-				fmt.Print("#")
-			} else {
-				fmt.Print(".")
-			}
-		}
-		fmt.Println()
-	}
-
-	curX, curY := 500, 0
+	curX, curY, done := 500, 0, false
 	for {
 		if field[0][500] {
 			break
@@ -68,11 +58,17 @@ func main() {
 			curX, curY = 500, 0
 		}
 		if curY > maxY || curX > maxX || curX < minX {
-			break
+			if !done {
+				fmt.Println("Part 1:", c)
+				done = true
+			}
+		}
+		if curY == maxY+1 {
+			c++
+			field[curY][curX] = true
+			curX, curY = 500, 0
 		}
 
 	}
-
-	_ = f
-	fmt.Println(c)
+	fmt.Println("Part 2:", c)
 }
