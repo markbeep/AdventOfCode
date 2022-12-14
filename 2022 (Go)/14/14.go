@@ -12,7 +12,7 @@ func main() {
 	f := util.ReadS("inp.txt", "\n")
 	c := 0
 	re := regexp.MustCompile(`(\d+,\d+)`)
-	field := util.Array2[bool](10000, 10000)
+	field := util.Array2[bool](800, 800)
 	minX, maxX, minY, maxY := 999, 0, 999, 0
 	for _, v := range f {
 		p := re.FindAllString(v, -1)
