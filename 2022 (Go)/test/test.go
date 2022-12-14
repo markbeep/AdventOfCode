@@ -10,7 +10,7 @@ import (
 func main() {
 	f := util.ReadS("inp.txt", "\n")
 	var s, e *node.Node[rune]
-	ns := util.Array[*node.Node[rune]](len(f), len(f[0]))
+	ns := util.Array2[*node.Node[rune]](len(f), len(f[0]))
 	for i, a := range f {
 		for j, b := range a {
 			ns[i][j] = node.Create(b)

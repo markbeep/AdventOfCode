@@ -21,10 +21,23 @@ func ReadS(fp, split string) []string {
 }
 
 // Makes a 2D array
-func Array[T any](y, x int) [][]T {
+func Array2[T any](y, x int) [][]T {
 	p := make([][]T, y)
 	for i := range p {
 		p[i] = make([]T, x)
+	}
+	return p
+}
+
+// Makes a 3D array
+func Array3[T any](z, y, x int) [][][]T {
+	p := make([][][]T, z)
+	for i, q := range p {
+		p[i] = make([][]T, y)
+		for j := range q {
+			q[j] = make([]T, x)
+
+		}
 	}
 	return p
 }

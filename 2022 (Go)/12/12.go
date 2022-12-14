@@ -38,7 +38,7 @@ func main() {
 }
 
 func bfs(q []*Point, f []string, e *Point, ch chan int) {
-	vis := util.Array[bool](len(f), len(f[0]))
+	vis := util.Array2[bool](len(f), len(f[0]))
 	for len(q) > 0 {
 		po := q[0]
 		q = q[1:]
