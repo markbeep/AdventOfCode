@@ -14,11 +14,17 @@ func main() {
 	f := util.ReadS("inp.txt", "\n")
 	c := 0
 
-	line := 2000000
-	// inclusive ranges
-	xranges := []nrange{}
-	// yranges := []nrange{}
+	for i := 0; i < 20; i++ {
+	}
+	for _, v := range single(2000000, f) {
+		c += v.to - v.from
+	}
+	fmt.Println("Part 1:", c)
 
+}
+
+func single(line int, f []string) []nrange {
+	xranges := []nrange{}
 	for _, v := range f {
 		var sx, sy, bx, by int
 		fmt.Sscanf(v, "Sensor at x=%d, y=%d: closest beacon is at x=%d, y=%d", &sx, &sy, &bx, &by)
@@ -30,14 +36,7 @@ func main() {
 		size := ints.Abs(distToLine - dist)
 		xranges = combine(xranges, nrange{from: sx - size, to: sx + size})
 	}
-	for _, v := range xranges {
-		c += v.to - v.from
-	}
-
-	fmt.Println(xranges)
-
-	_ = f
-	fmt.Println(c)
+	return xranges
 }
 
 // adds a new range and handles intersections
