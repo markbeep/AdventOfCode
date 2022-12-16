@@ -41,3 +41,11 @@ func Array3[T any](z, y, x int) [][][]T {
 	}
 	return p
 }
+
+func CopyMap[T comparable, E any](m map[T]E) map[T]E {
+	cpy := map[T]E{}
+	for k, v := range m {
+		cpy[k] = v
+	}
+	return cpy
+}
