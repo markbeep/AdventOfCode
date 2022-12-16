@@ -42,34 +42,52 @@ func main() {
 			children[res[0]][k] = true
 		}
 	}
-	for k, v := range nodes {
+
+	for k := range nodes {
 		for k2 := range children[k] {
-			// nodes[k2].Sub = append(nodes[k2].Sub, nodes[k])
 			nodes[k].Sub = append(nodes[k].Sub, nodes[k2])
 		}
-		fmt.Printf("%s: %d (%d)\n", k, len(v.Sub), v.Val.rate)
 	}
-	fmt.Println(rec(nodes["AA"], map[string]bool{}, 1, 0))
+
+	ranges := map[string]map[*node.Node[Duo]]int{}
+	for k, v := range nodes {
+		ranges[k] = node.Bfs([]*node.Node[Duo]{v}, map[*node.Node[Duo]]bool{}, map[*node.Node[Duo]]int{})
+	}
+	slim := map[string]map[*node.Node[Duo]]int{}
+	for k, v := range ranges {
+		slim[k] = map[*node.Node[Duo]]int{}
+		for k2, v2 := range v {
+			if k2.Val.rate > 0 {
+				slim[k][k2] = v2
+			}
+		}
+	}
+
+	for k, v := range slim {
+		fmt.Print(k, ": ")
+		for k2, v2 := range v {
+			fmt.Printf("%s:%d | ", k2.Val.name, v2)
+		}
+		fmt.Println()
+	}
+
+	fmt.Println("Part 1:", rec(nodes["AA"], slim, map[string]bool{}, 0, 0))
 	fmt.Println(c)
 }
 
-func rec(n *node.Node[Duo], open map[string]bool, min, cur int) int {
-	if min >= 10 {
+func rec(n *node.Node[Duo], dist map[string]map[*node.Node[Duo]]int, vis map[string]bool, min, cur int) int {
+	if min > 30 || vis[n.Val.name] {
 		return cur
 	}
+	cpy := util.CopyMap(vis)
+	cur += (30 - min) * n.Val.rate
 	c++
-	results := []int{}
-	shouldOpen := !open[n.Val.name]
-	var cpy map[string]bool
-	if shouldOpen {
-		cpy = util.CopyMap(open)
-		cpy[n.Val.name] = true
-	}
-	for _, v := range n.Sub {
-		if n.Val.rate > 0 && shouldOpen {
-			results = append(results, rec(v, cpy, min+2, cur+(30-min)*n.Val.rate)) // open valve
+	nw := 0
+	cpy[n.Val.name] = true
+	for k, v := range dist[n.Val.name] {
+		if !vis[k.Val.name] {
+			nw = ints.Max(nw, rec(k, dist, cpy, min+v+1, cur))
 		}
-		results = append(results, rec(v, open, min+1, cur)) // don't open
 	}
-	return ints.Max(results...)
+	return nw
 }

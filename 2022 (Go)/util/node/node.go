@@ -23,7 +23,7 @@ func (n *Node[T]) Append(o *Node[T]) *Node[T] {
 	return o
 }
 
-func Bfs[T comparable](q []*Node[T], vis map[*Node[T]]bool, dist map[*Node[T]]int) map[*Node[T]]int {
+func Bfs[T any](q []*Node[T], vis map[*Node[T]]bool, dist map[*Node[T]]int) map[*Node[T]]int {
 	for len(q) > 0 {
 		p := q[0]
 		q = q[1:]
