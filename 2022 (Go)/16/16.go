@@ -44,7 +44,7 @@ func main() {
 		}
 	}
 	fmt.Println("Part 1:", rec(nodes["AA"], ranges, map[string]bool{}, 0, 0))
-	fmt.Println("Part 2:", rec2(nodes["AA"], nodes["AA"], ranges, map[string]bool{}, 0, 0, 0, 0))
+	fmt.Println("Part 2:", rec2(nodes["AA"], nodes["AA"], ranges, map[string]bool{}, 0, 0, 0, 2))
 }
 
 func rec(n *node.Node[Duo], dist map[string]map[*node.Node[Duo]]int, vis map[string]bool, min, cur int) int {
@@ -64,49 +64,46 @@ func rec(n *node.Node[Duo], dist map[string]map[*node.Node[Duo]]int, vis map[str
 }
 
 func rec2(n1, n2 *node.Node[Duo], dist map[string]map[*node.Node[Duo]]int, vis map[string]bool, min, m1, m2, cur int) int {
-	if min > 5 || vis[n1.Val.name] || vis[n2.Val.name] {
+	if min > 30 {
 		return cur
 	}
 	ch1, ch2 := false, false
 	if min == m1 {
 		ch1 = true
 		cur += (26 - min) * n1.Val.rate
-		fmt.Println("kek1", cur, m1)
 	}
 	if min == m2 {
 		ch2 = true
 		cur += (26 - min) * n2.Val.rate
-		fmt.Println("kek2", cur, m2)
 	}
-	nw := 0
 	cpy := util.CopyMap(vis)
 	cpy[n1.Val.name] = true
 	cpy[n2.Val.name] = true
-	if !ch1 && !ch2 { // stay on the same nodes, inc minute
-		fmt.Printf("Change nothing: (%s, %s) [%d, %d] [%d, %d]\n", n1.Val.name, n2.Val.name, min, cur, m1, m2)
-		nw = ints.Max(nw, rec2(n1, n2, dist, cpy, min+1, m1, m2, cur))
-	} else if ch1 && ch2 { // change both nodes
-		fmt.Printf("Change both: (%s, %s) [%d, %d]\n", n1.Val.name, n2.Val.name, min, cur)
+	nw := cur
+	if ch1 && ch2 { // change both nodes
 		for k1, v1 := range dist[n1.Val.name] {
 			if !vis[k1.Val.name] {
 				for k2, v2 := range dist[n2.Val.name] {
-					if k1 != k2 {
+					if k1 != k2 && !vis[k2.Val.name] {
 						nw = ints.Max(nw, rec2(k1, k2, dist, cpy, min+1, min+v1+1, min+v2+1, cur))
 					}
 				}
 			}
 		}
 	} else if ch1 { // change first node
-		fmt.Printf("Change ch1: (%s, %s) [%d, %d]\n", n1.Val.name, n2.Val.name, min, cur)
 		for k1, v1 := range dist[n1.Val.name] {
-			nw = ints.Max(nw, rec2(k1, n2, dist, cpy, min+1, min+v1+1, m2, cur))
+			if k1 != n2 && !vis[k1.Val.name] {
+				nw = ints.Max(nw, rec2(k1, n2, dist, cpy, min+1, min+v1+1, m2, cur))
+			}
 		}
 	} else if ch2 { // change second node
-		fmt.Printf("Change ch2: (%s, %s) [%d, %d]\n", n1.Val.name, n2.Val.name, min, cur)
 		for k2, v2 := range dist[n2.Val.name] {
-			nw = ints.Max(nw, rec2(n1, k2, dist, cpy, min+1, m1, min+v2+1, cur))
+			if n1 != k2 && !vis[k2.Val.name] {
+				nw = ints.Max(nw, rec2(n1, k2, dist, cpy, min+1, m1, min+v2+1, cur))
+			}
 		}
-
+	} else { // stay on the same nodes, inc minute
+		nw = rec2(n1, n2, dist, cpy, min+1, m1, m2, cur)
 	}
 	return nw
 }
