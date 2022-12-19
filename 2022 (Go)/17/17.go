@@ -2,6 +2,7 @@ package main
 
 import (
 	"aoc/util"
+	"aoc/util/ints"
 	"fmt"
 )
 
@@ -26,51 +27,76 @@ func main() {
 		{2, [][]int{{1, 1}, {1, 1}}},
 	}
 
-	y, x, pi, startHeight, cur := 3, 2, 0, 3, 0
-	c := 0
+	y, x, cur, c := 3, 2, 0, 0
+	p1 := false
+	oldHeight := 0
+	extra := len(f) % len(pieces)
+	lm := 0
+	fmt.Println("Extra:", extra)
+	var p2Height int64
+	path := []int{}
+	_, _, _, _ = p1, p2Height, lm, path
 	for {
 		moved := false
 		dir := f[cur%len(f)]
-		// pBoard(board, x, y)
-		if dir == '>' && canMove(board, pieces[pi], '>', x, y) {
+		pie := pieces[c%len(pieces)]
+		if dir == '>' && canMove(board, pie, '>', x, y) {
 			x++
 		}
-		if dir == '<' && canMove(board, pieces[pi], '<', x, y) {
+		if dir == '<' && canMove(board, pie, '<', x, y) {
 			x--
 		}
-		if canMove(board, pieces[pi], 'v', x, y) {
+		if canMove(board, pie, 'v', x, y) {
 			y--
 			moved = true
 		}
-		// fmt.Println("DIR:", string(dir), cur)
+		if cur%1000000 == 0 {
+			fmt.Println(cur)
+		}
 		cur++
 		if !moved {
+			for i := c%len(pieces) + len(pieces); i < len(path); i += len(pieces) {
+				for j := 0; j < len(path)-i; j++ {
+					if path[j] != path[j+i] {
+						lm = ints.Max(lm, j)
+						break
+					} else {
+						lm = ints.Max(lm, j+1)
+					}
+				}
+			}
+			if lm > 10 {
+				pBoard(board, 3, y)
+				fmt.Println(c, lm)
+				break
+			}
+			path = append(path, x)
+
 			// place piece
-			for i := 0; i < len(pieces[pi].grid); i++ {
-				for j := 0; j < len(pieces[pi].grid[i]); j++ {
-					if pieces[pi].grid[len(pieces[pi].grid)-i-1][j] == 1 {
+			for i := 0; i < len(pie.grid); i++ {
+				for j := 0; j < len(pie.grid[i]); j++ {
+					if pie.grid[len(pie.grid)-i-1][j] == 1 {
 						board[y+i][x+j] = 1
 					}
 				}
 			}
-			startHeight = y + int(pieces[pi].height) + 3
-			pi = (pi + 1) % len(pieces)
+			y, x = measure(board)+4, 2 // reset starting values
+			_ = oldHeight
+			oldHeight = y
 			// make sure field is big enough
-			y, x = startHeight, 2 // reset starting values
-			if len(board) < y+int(pieces[pi].height) {
-				for i := 0; i < y+int(pieces[pi].height)-len(board); i++ {
+			if len(board) < y+int(pie.height) {
+				for i := 0; i < y+int(pie.height)-len(board); i++ {
 					board = append(board, make([]int8, 7))
 				}
 			}
 			c++
-			// pBoard(board, 0, 0)
 			if c == 2022 {
-				break
+				fmt.Println("Part 1:", measure(board)+1)
+				p1 = true
 			}
 		}
+
 	}
-	// find last line
-	fmt.Println(measure(board))
 }
 
 func measure(board [][]int8) int {
