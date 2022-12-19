@@ -13,6 +13,15 @@ type Duo struct {
 	name string
 }
 
+type Path struct {
+	vis int64
+	cur int
+}
+
+var c = 0
+var paths = []Path{}
+var bitfield = map[string]int64{}
+
 func main() {
 	f := util.ReadS("inp.txt", "\n")
 	re, reRate := regexp.MustCompile(`([A-Z]){2}`), regexp.MustCompile(`(\d+)`)
@@ -20,7 +29,7 @@ func main() {
 	for _, v := range f {
 		res := re.FindAllString(v, -1)
 		rate := ints.SInt(reRate.FindString(v))
-
+		bitfield[res[0]] = 1 << len(bitfield)
 		if nodes[res[0]] == nil {
 			nodes[res[0]] = node.Create(Duo{rate: rate, name: res[0]})
 		}
@@ -43,77 +52,45 @@ func main() {
 			}
 		}
 	}
-	fmt.Println("Part 1:", rec(nodes["AA"], ranges, map[string]bool{}, 0, 0))
-	fmt.Println("Part 2:", rec2(nodes["AA"], nodes["AA"], ranges, map[string]bool{}, 0, 0, 0, 2))
+	part1 := rec(nodes["AA"], bitfield["AA"], 0, ranges, 0, 0)
+	fmt.Println("Part 1:", part1)
+	rec2(nodes["AA"], bitfield["AA"], 0, ranges, 0, 0)
+	m := 0
+	for _, a := range paths {
+		if a.cur < part1/2 {
+			continue
+		}
+		for _, b := range paths {
+			if a.vis&b.vis == bitfield["AA"] {
+				m = ints.Max(m, a.cur+b.cur)
+			}
+		}
+	}
+	fmt.Println("Part 2:", m)
 }
 
-func rec(n *node.Node[Duo], dist map[string]map[*node.Node[Duo]]int, vis map[string]bool, min, cur int) int {
-	if min > 30 || vis[n.Val.name] {
+func rec(n *node.Node[Duo], nInt, vis int64, dist map[string]map[*node.Node[Duo]]int, min, cur int) int {
+	if min > 30 || nInt&vis > 0 {
 		return cur
 	}
-	cpy := util.CopyMap(vis)
+	c++
 	cur += (30 - min) * n.Val.rate
 	nw := 0
-	cpy[n.Val.name] = true
 	for k, v := range dist[n.Val.name] {
-		if !vis[k.Val.name] {
-			nw = ints.Max(nw, rec(k, dist, cpy, min+v+1, cur))
-		}
+		nw = ints.Max(nw, rec(k, bitfield[k.Val.name], vis|nInt, dist, min+v+1, cur))
 	}
 	return nw
 }
 
-func rec2(n1, n2 *node.Node[Duo], dist map[string]map[*node.Node[Duo]]int, vis map[string]bool, min, m1, m2, cur int) int {
-	if min > 30 {
+func rec2(n *node.Node[Duo], nInt, vis int64, dist map[string]map[*node.Node[Duo]]int, min, cur int) int {
+	if min > 26 || nInt&vis > 0 {
 		return cur
 	}
-	ch1, ch2 := false, false
-	if min == m1 {
-		ch1 = true
-		cur += (26 - min) * n1.Val.rate
-	}
-	if min == m2 {
-		ch2 = true
-		cur += (26 - min) * n2.Val.rate
-	}
-	cpy := util.CopyMap(vis)
-	cpy[n1.Val.name] = true
-	cpy[n2.Val.name] = true
-	nw := cur
-	if ch1 && ch2 { // change both nodes
-		for k1, v1 := range dist[n1.Val.name] {
-			if !vis[k1.Val.name] {
-				for k2, v2 := range dist[n2.Val.name] {
-					if k1 != k2 && !vis[k2.Val.name] {
-						nw = ints.Max(nw, rec2(k1, k2, dist, cpy, min+1, min+v1+1, min+v2+1, cur))
-					}
-				}
-			}
-		}
-	} else if ch1 { // change first node
-		for k1, v1 := range dist[n1.Val.name] {
-			if k1 != n2 && !vis[k1.Val.name] {
-				nw = ints.Max(nw, rec2(k1, n2, dist, cpy, min+1, min+v1+1, m2, cur))
-			}
-		}
-	} else if ch2 { // change second node
-		for k2, v2 := range dist[n2.Val.name] {
-			if n1 != k2 && !vis[k2.Val.name] {
-				nw = ints.Max(nw, rec2(n1, k2, dist, cpy, min+1, m1, min+v2+1, cur))
-			}
-		}
-	} else { // stay on the same nodes, inc minute
-		nw = rec2(n1, n2, dist, cpy, min+1, m1, m2, cur)
+	cur += (26 - min) * n.Val.rate
+	paths = append(paths, Path{vis: vis | nInt, cur: cur})
+	nw := 0
+	for k, v := range dist[n.Val.name] {
+		nw = ints.Max(nw, rec2(k, bitfield[k.Val.name], vis|nInt, dist, min+v+1, cur))
 	}
 	return nw
-}
-
-func pRanges(ranges map[string]map[*node.Node[Duo]]int) {
-	for k, v := range ranges {
-		fmt.Print(k, ": ")
-		for k2, v2 := range v {
-			fmt.Printf("%s:%d | ", k2.Val.name, v2)
-		}
-		fmt.Println()
-	}
 }
