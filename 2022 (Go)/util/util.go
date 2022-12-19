@@ -32,11 +32,10 @@ func Array2[T any](y, x int) [][]T {
 // Makes a 3D array
 func Array3[T any](z, y, x int) [][][]T {
 	p := make([][][]T, z)
-	for i, q := range p {
+	for i := 0; i < z; i++ {
 		p[i] = make([][]T, y)
-		for j := range q {
-			q[j] = make([]T, x)
-
+		for j := 0; j < y; j++ {
+			p[i][j] = make([]T, x)
 		}
 	}
 	return p
