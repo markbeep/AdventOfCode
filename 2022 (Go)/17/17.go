@@ -34,7 +34,8 @@ func main() {
 	lm := 0
 	fmt.Println("Extra:", extra)
 	var p2Height int64
-	path := []int{}
+	path := [][]int{}
+	p2 := 0
 	_, _, _, _ = p1, p2Height, lm, path
 	for {
 		moved := false
@@ -55,22 +56,27 @@ func main() {
 		}
 		cur++
 		if !moved {
-			for i := c%len(pieces) + len(pieces); i < len(path); i += len(pieces) {
-				for j := 0; j < len(path)-i; j++ {
-					if path[j] != path[j+i] {
-						lm = ints.Max(lm, j)
-						break
-					} else {
-						lm = ints.Max(lm, j+1)
+			if lm < 15 {
+				path = append(path, []int{x, measure(board)})
+				for start := 0; start < len(path); start++ {
+					for i := 1; i < len(path); i++ {
+						for j := 0; j < len(path)-i-start; j++ {
+							if path[start+j][0] != path[start+j+i][0] || (start+j > 0 && start+j+i > 0 && (path[start+j][1]-path[start+j-1][1]) != (path[start+j+i][1]-path[start+j+i-1][1])) {
+								lm = ints.Max(lm, j)
+								break
+							} else {
+								if j >= 14 {
+									fmt.Println("START:", start+j)
+								}
+								lm = ints.Max(lm, j+1)
+							}
+						}
 					}
 				}
-			}
-			if lm > 10 {
-				pBoard(board, 3, y)
 				fmt.Println(c, lm)
-				break
+			} else if p2 == 0 {
+				p2 = c
 			}
-			path = append(path, x)
 
 			// place piece
 			for i := 0; i < len(pie.grid); i++ {
@@ -93,6 +99,15 @@ func main() {
 			if c == 2022 {
 				fmt.Println("Part 1:", measure(board)+1)
 				p1 = true
+			}
+			if p1 && lm >= 15 {
+				fmt.Printf("Range: [%d:%d]\n", lm, path[p2-1][1]-path[p2-lm-1][1])
+				for i, v := range path[20:] {
+					fmt.Printf("%d-%d ", i+20, v[0])
+				}
+				fmt.Println("\nHeight:", path[46][1]-path[22][1])
+				fmt.Println("H-before:", path[22][1])
+				break
 			}
 		}
 
