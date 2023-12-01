@@ -38,18 +38,18 @@ func part1(input string) int {
 
 func part2(input string) int {
 	repl := map[string]string{
-		"one":   "1",
-		"two":   "2",
-		"three": "3",
+		"one":   "o1e",
+		"two":   "t2",
+		"three": "t3e",
 		"four":  "4",
-		"five":  "5",
+		"five":  "5e",
 		"six":   "6",
-		"seven": "7",
-		"eight": "8",
-		"nine":  "9",
+		"seven": "7n",
+		"eight": "e8t",
+		"nine":  "n9e",
 	}
 	for key, v := range repl {
-		input = strings.ReplaceAll(input, key, fmt.Sprintf("%s%s%s", key, v, key))
+		input = strings.ReplaceAll(input, key, v)
 	}
 	f := strings.Split(input, "\n")
 	return count(f)
