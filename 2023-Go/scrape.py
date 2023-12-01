@@ -16,7 +16,7 @@ HEADERS = {"User-Agent": f"Fetch tool by {os.getenv('EMAIL', 'n/a')}"}
 
 def fetch(day: int):
     r = requests.get(
-        f"https://adventofcode.com/2022/day/{day}/input",
+        f"https://adventofcode.com/2023/day/{day}/input",
         cookies={"session": SESSION_KEY},
         headers=HEADERS)
     try:

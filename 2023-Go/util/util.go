@@ -14,7 +14,7 @@ func Read(fp string) string {
 	if err != nil {
 		log.Fatal(err)
 	}
-	return strings.Trim(string(f), " \n\r")
+	return strings.TrimSpace(string(f))
 }
 
 // Read in a file, trim and then split

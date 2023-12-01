@@ -14,6 +14,8 @@
           buildInputs = with pkgs; [ 
               go
               python310
+              python310Packages.requests
+              python310Packages.python-dotenv
           ];
         };
       }
