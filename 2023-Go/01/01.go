@@ -2,6 +2,7 @@ package main
 
 import (
 	"aoc/util"
+	"aoc/util/ints"
 	_ "embed"
 	"flag"
 	"fmt"
@@ -31,9 +32,39 @@ func main() {
 }
 
 func part1(input string) int {
-	return 0
+	f := strings.Split(input, "\n")
+	return count(f)
 }
 
 func part2(input string) int {
-	return 0
+	repl := map[string]string{
+		"one":   "1",
+		"two":   "2",
+		"three": "3",
+		"four":  "4",
+		"five":  "5",
+		"six":   "6",
+		"seven": "7",
+		"eight": "8",
+		"nine":  "9",
+	}
+	for key, v := range repl {
+		input = strings.ReplaceAll(input, key, fmt.Sprintf("%s%s%s", key, v, key))
+	}
+	f := strings.Split(input, "\n")
+	return count(f)
+}
+
+func count(f []string) int {
+	c := 0
+	for _, v := range f {
+		s := []rune{}
+		for _, b := range v {
+			if '0' <= b && b <= '9' {
+				s = append(s, b)
+			}
+		}
+		c += ints.SInt(fmt.Sprintf("%c%c", s[0], s[len(s)-1]))
+	}
+	return c
 }

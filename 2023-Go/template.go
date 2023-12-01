@@ -1,7 +1,9 @@
 package main
 
 import (
+	"aoc/util"
 	_ "embed"
+	"flag"
 	"fmt"
 	"strings"
 )
@@ -13,13 +15,25 @@ func init() {
 	input = strings.TrimSpace(input)
 }
 
+var part = flag.Int("part", 1, "the part to execute the code for")
+
 func main() {
-	f := strings.Split(input, "\n")
-	c := 0
-
-	for _, v := range f {
-		fmt.Sscanf(v, "")
-
+	flag.Parse()
+	if *part == 1 {
+		ans := part1(input)
+		util.CopyToClipboard(ans)
+		fmt.Printf("P1: %d\n", ans)
+	} else {
+		ans := part2(input)
+		util.CopyToClipboard(ans)
+		fmt.Printf("P2: %d\n", ans)
 	}
-	fmt.Println(c)
+}
+
+func part1(input string) int {
+	return 0
+}
+
+func part2(input string) int {
+	return 0
 }
