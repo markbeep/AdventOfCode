@@ -5,7 +5,6 @@ import (
 	_ "embed"
 	"flag"
 	"fmt"
-	"math"
 	"regexp"
 	"strings"
 )
@@ -17,7 +16,7 @@ func init() {
 	input = strings.TrimSpace(input)
 }
 
-var part = flag.Int("part", 2, "the part to execute the code for")
+var part = flag.Int("part", 1, "the part to execute the code for")
 
 func main() {
 	flag.Parse()
@@ -56,7 +55,9 @@ func getWinners(input string) [][]string {
 func part1(input string) int {
 	c := 0
 	for _, line := range getWinners(input) {
-		c += int(math.Pow(2, float64(len(line)-1)))
+		if len(line) > 0 {
+			c += 1 << (len(line) - 1)
+		}
 	}
 	return c
 }
