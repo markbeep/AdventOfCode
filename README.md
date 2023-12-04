@@ -7,6 +7,7 @@ These are not to be seen as master solutions, as they are done in languages I'm 
 
 ---
 
-- **2022:** Go
+- **2023:** Go
+- **2022:** Go, Nix
 - **2021:** JavaScript
 - **2020:** Java
