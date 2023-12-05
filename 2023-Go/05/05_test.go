@@ -5,8 +5,8 @@ import (
 )
 
 const (
-	expected1 = 0
-	expected2 = 0
+	expected1 = 340994526
+	expected2 = 52210644
 )
 
 func BenchmarkPart1(b *testing.B) {
