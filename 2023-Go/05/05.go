@@ -78,60 +78,101 @@ func part1(input string) int {
 	return mx
 }
 
+func translateR(seedRanges []seedRange, loc []int) [][]int {
+	newLocs := [][]int{}
+	for i := 0; i < len(seedRanges); i++ {
+		if len(loc) == 0 {
+			break
+		}
+		r := seedRanges[i]
+		start := loc[0]
+		length := loc[1]
+		offset := r.sourceRange - r.destRange
+		rightMost := start + length - 1
+
+		// inbetween [1, {2, 3}, 4]
+		if start >= r.sourceRange && rightMost < r.sourceRange+r.length {
+			newLocation := []int{start - offset, length}
+			newLocs = append(newLocs, newLocation)
+			loc = []int{}
+			break // TODO: maybe not needed
+		} else if start >= r.sourceRange && start < r.sourceRange+r.length {
+			// right part overlaps [1, 2, {3, 4], 5}
+			newLength := r.sourceRange + r.length - start
+			newLocation := []int{start - offset, newLength}
+			newLocs = append(newLocs, newLocation)
+
+			newLocs = append(newLocs, translateR(seedRanges, []int{r.sourceRange + r.length, length - newLength})...)
+			loc = []int{}
+			break
+		} else if start < r.sourceRange && rightMost >= r.sourceRange+length {
+			// completely overlaps
+			newLocation := []int{r.destRange, r.length}
+			newLocs = append(newLocs, newLocation)
+
+			newLocs = append(newLocs, translateR(seedRanges, []int{start, r.sourceRange - start})...)
+			newLocs = append(newLocs, translateR(seedRanges, []int{r.sourceRange + r.length, rightMost - (r.sourceRange + r.length)})...)
+			loc = []int{}
+			break
+		} else if start < r.sourceRange && rightMost >= r.sourceRange && rightMost < r.sourceRange+length {
+			// left is outside, rightside is inside {0, [1, 2, 3}, 4]
+			newLength := rightMost - r.sourceRange
+			fmt.Println(start, rightMost, newLength)
+			newLocation := []int{r.sourceRange, newLength}
+			newLocs = append(newLocs, newLocation)
+
+			newLocs = append(newLocs, translateR(seedRanges, []int{start, length - newLength})...)
+			loc = []int{}
+			break
+		}
+
+	}
+	if len(loc) == 2 {
+		// 0 overlap
+		newLocs = append(newLocs, loc)
+	}
+
+	return newLocs
+}
+
 func translateRange(seedRanges []seedRange, locRange ...[]int) [][]int {
 	newLocs := [][]int{}
 	for _, loc := range locRange {
-		start := loc[0]
-		length := loc[1]
-		added := false
-		for _, r := range seedRanges {
-			offset := r.sourceRange - r.destRange
-			if start >= r.sourceRange && start < r.sourceRange+r.length {
-				rightCutoff := min(r.sourceRange+r.length, start+length)
-				newLocation := []int{start - offset, min(length, rightCutoff-r.sourceRange)}
-				newLocs = append(newLocs, newLocation)
-				added = true
-				break
-			} else if start < r.sourceRange && start+length >= r.sourceRange {
-				rightCutoff := min(r.sourceRange+r.length, start+length)
-				newLocation := []int{r.destRange, min(length, rightCutoff-r.sourceRange)}
-				newLocs = append(newLocs, newLocation)
-				// add the lower half
-				newLocs = append(newLocs, []int{start, r.sourceRange - start})
-				added = true
-				break
-			}
-		}
-		if !added {
-			newLocs = append(newLocs, loc)
-		}
+		newLocs = append(newLocs, translateR(seedRanges, loc)...)
 	}
 	return newLocs
 }
 
 func part2(input string) int {
-	f := strings.Split(input, "\n\n")
-	re := regexp.MustCompile(`\d+`)
-	res := re.FindAllString(f[0], -1)
-	seeds := [][]int{}
-	for i := 0; i < len(res); i += 2 {
-		seeds = append(seeds, []int{ints.SInt(res[i]), ints.SInt(res[i+1])})
-	}
 
-	for _, v := range f[1:] {
-		seedRanges := []seedRange{}
-		lines := strings.Split(v, "\n")
-		for _, line := range lines[1:] {
-			var d, s, r int
-			fmt.Sscanf(line, "%d %d %d", &d, &s, &r)
-			seedRanges = append(seedRanges, seedRange{destRange: d, sourceRange: s, length: r})
-		}
-		seeds = translateRange(seedRanges, seeds...)
-	}
+	fmt.Println(translateR([]seedRange{{destRange: 10, sourceRange: 1, length: 10}}, []int{0, 20}))
+	// [1, 2, 3, 4, 5, 6, 7, 8, 9, {10], 11, 12}, 13, 14, 15, 16, 17, 18, 19
+	fmt.Println()
 
-	mx := math.MaxInt
-	for _, v := range seeds {
-		mx = min(mx, v[0])
-	}
-	return mx
+	return 0
+	// f := strings.Split(input, "\n\n")
+	// re := regexp.MustCompile(`\d+`)
+	// res := re.FindAllString(f[0], -1)
+	// seeds := [][]int{}
+	// for i := 0; i < len(res); i += 2 {
+	// 	seeds = append(seeds, []int{ints.SInt(res[i]), ints.SInt(res[i+1])})
+	// }
+
+	// for _, v := range f[1:] {
+	// 	seedRanges := []seedRange{}
+	// 	lines := strings.Split(v, "\n")
+	// 	for _, line := range lines[1:] {
+	// 		var d, s, r int
+	// 		fmt.Sscanf(line, "%d %d %d", &d, &s, &r)
+	// 		seedRanges = append(seedRanges, seedRange{destRange: d, sourceRange: s, length: r})
+	// 	}
+	// 	fmt.Println(seeds)
+	// 	seeds = translateRange(seedRanges, seeds...)
+	// }
+
+	// mx := math.MaxInt
+	// for _, v := range seeds {
+	// 	mx = min(mx, v[0])
+	// }
+	// return mx
 }
