@@ -1,6 +1,7 @@
 import gleeunit
 import gleeunit/should
 import one
+import three
 import two
 
 pub fn main() {
@@ -21,4 +22,12 @@ pub fn d2_1_test() {
 
 pub fn d2_2_test() {
   two.two() |> should.equal(63_981)
+}
+
+pub fn d3_1_test() {
+  three.one() |> should.equal(527_369)
+}
+
+pub fn d3_2_test() {
+  three.two() |> should.equal(73_074_886)
 }
