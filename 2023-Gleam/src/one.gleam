@@ -2,12 +2,7 @@ import gleam/int
 import gleam/list
 import gleam/result
 import gleam/string
-import simplifile
-
-fn read_file(filename) -> String {
-  let assert Ok(x) = simplifile.read(filename)
-  x
-}
+import utils
 
 fn nums(line: String) -> Int {
   let is_num = fn(x) { result.is_ok(int.parse(x)) }
@@ -18,9 +13,7 @@ fn nums(line: String) -> Int {
 }
 
 pub fn one() {
-  read_file("days/day1.txt")
-  |> string.trim
-  |> string.split("\n")
+  utils.prepare_file("days/1.txt")
   |> list.map(nums)
   |> int.sum
 }
@@ -54,9 +47,7 @@ fn get_numbers(line) -> Int {
 }
 
 pub fn two() {
-  read_file("days/day1.txt")
-  |> string.trim
-  |> string.split("\n")
+  utils.prepare_file("days/1.txt")
   |> list.map(get_numbers)
   |> int.sum
 }

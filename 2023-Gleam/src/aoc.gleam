@@ -1,7 +1,7 @@
 import gleam/io
-import one
+import two
 
 pub fn main() {
-  io.debug(one.one())
-  io.debug(one.two())
+  // io.debug(two.one())
+  io.debug(two.two())
 }
