@@ -1,3 +1,4 @@
+import five
 import four
 import gleeunit
 import gleeunit/should
@@ -39,4 +40,12 @@ pub fn d4_1_test() {
 
 pub fn d4_2_test() {
   four.two() |> should.equal(9_881_048)
+}
+
+pub fn d5_1_test() {
+  five.one() |> should.equal(Ok(340_994_526))
+}
+
+pub fn d5_2_test() {
+  five.two() |> should.equal(9_881_048)
 }
