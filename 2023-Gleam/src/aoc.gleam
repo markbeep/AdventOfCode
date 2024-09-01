@@ -1,6 +1,6 @@
+import four
 import gleam/io
-import three
 
 pub fn main() {
-  io.debug(three.two())
+  io.debug(four.two())
 }
