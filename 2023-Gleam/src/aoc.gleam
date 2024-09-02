@@ -2,5 +2,5 @@ import five
 import gleam/io
 
 pub fn main() {
-  io.debug(five.one())
+  io.debug(five.two())
 }
