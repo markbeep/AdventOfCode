@@ -4,7 +4,7 @@ use crate::Solution;
 
 pub fn solve() -> Solution {
     // 2022 day 1 as warmup
-    let f = read_to_string("input/01.txt").unwrap();
+    let f = read_to_string("input/00.txt").unwrap();
     let mut elves = f
         .trim()
         .split("\n\n")

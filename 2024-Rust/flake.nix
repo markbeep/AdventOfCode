@@ -45,6 +45,7 @@
             cargo-edit
             cargo-watch
             rust-analyzer
+            hyperfine
           ];
 
           env = {
