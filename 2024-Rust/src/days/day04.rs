@@ -9,31 +9,36 @@ pub fn solve() -> Solution {
         .split("\n")
         .map(|x| x.chars().collect::<Vec<char>>())
         .collect();
-    let mut combinations = t.to_owned();
-    let mut diag_down = String::new();
-    let mut diag_up = String::new();
-    let mut down = String::new();
-
-    for x in 0..arr[0].len() {
+    let to_compare = ['X', 'M', 'A', 'S'];
+    let to_compare_inv = ['S', 'A', 'M', 'X'];
+    let mut p1 = 0;
+    for x in 0..arr[0].len() - 3 {
         for y in 0..arr.len() {
-            down.push_str(&arr[y][x].to_string());
-            let xr = x + y;
-            let yd = arr.len() - y - 1;
-            if xr < arr[0].len() && y + 1 < arr.len() {
-                diag_down.push_str(&arr[y][xr].to_string());
-            }
-            if xr < arr[0].len() && yd > 0 {
-                diag_up.push_str(&arr[yd][xr].to_string());
+            p1 += (arr[y][x..x + 4] == to_compare || arr[y][x..x + 4] == to_compare_inv) as usize; // right
+            if y + 3 < arr.len() {
+                let diag_down = [
+                    arr[y][x],
+                    arr[y + 1][x + 1],
+                    arr[y + 2][x + 2],
+                    arr[y + 3][x + 3],
+                ];
+                p1 += (diag_down == to_compare || diag_down == to_compare_inv) as usize;
+                let left_diag_down = [
+                    arr[y][arr[0].len() - x - 1],
+                    arr[y + 1][arr[0].len() - x - 2],
+                    arr[y + 2][arr[0].len() - x - 3],
+                    arr[y + 3][arr[0].len() - x - 4],
+                ];
+                p1 += (left_diag_down == to_compare || left_diag_down == to_compare_inv) as usize;
             }
         }
     }
-    combinations.push_str(&diag_down);
-    combinations.push_str(&diag_up);
-    combinations.push_str(&down);
-    let backwards = combinations.chars().rev().collect::<String>();
-    combinations.push_str(&backwards);
-    let p1 = combinations.match_indices("XMAS").count();
+    for x in 0..arr[0].len() {
+        for y in 0..arr.len() - 3 {
+            let down = [arr[y][x], arr[y + 1][x], arr[y + 2][x], arr[y + 3][x]];
+            p1 += (down == to_compare || down == to_compare_inv) as usize; // up down
+        }
+    }
 
-    let p1 = String::from("XXMAS").match_indices("XMAS").count();
     (p1.to_string(), "".to_string())
 }
