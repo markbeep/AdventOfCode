@@ -10,12 +10,12 @@ enum Dir {
     Left,
 }
 impl Dir {
-    fn inc(self, pos: (i64, i64)) -> (i64, i64) {
+    fn inc(self, pos: (usize, usize)) -> (usize, usize) {
         match self {
-            Dir::Up => (pos.0 - 1, pos.1),
+            Dir::Up => (pos.0.wrapping_sub(1), pos.1),
             Dir::Right => (pos.0, pos.1 + 1),
             Dir::Down => (pos.0 + 1, pos.1),
-            Dir::Left => (pos.0, pos.1 - 1),
+            Dir::Left => (pos.0, pos.1.wrapping_sub(1)),
         }
     }
     fn next(self) -> Dir {
@@ -30,35 +30,22 @@ impl Dir {
 
 pub fn solve() -> Solution {
     let f = read_to_string("input/06.txt").unwrap();
-    let grid: Vec<Vec<char>> = f
+    let mut grid: Vec<Vec<char>> = f
         .trim()
         .split("\n")
         .map(|x| x.chars().collect::<Vec<char>>())
         .collect();
-    let mut cpy = grid.clone();
 
-    let pos = 'brk: {
-        for (i, row) in grid.iter().enumerate() {
-            for (j, c) in row.iter().enumerate() {
-                if *c == '^' {
-                    break 'brk (i as i64, j as i64);
-                }
-            }
-        }
-        (0, 0)
-    };
+    let pos = f.find('^').unwrap();
+    let pos = (pos / (grid[0].len() + 1), pos % (grid[0].len() + 1));
     let mut visited = HashSet::from([pos]);
-    let p1 = iterate_until_done(&grid, pos, &mut visited).unwrap();
+    let mut empty = HashSet::new();
+    let p1 = iterate_until_done(&grid, pos, &mut visited, true).unwrap();
     let mut p2 = 0;
     for (i, j) in visited.iter() {
-        if grid[*i as usize][*j as usize] == '.' {
-            cpy[*i as usize][*j as usize] = '#';
-            match iterate_until_done(&cpy, pos, &mut HashSet::from([pos])) {
-                None => p2 += 1,
-                Some(_) => {}
-            }
-            cpy[*i as usize][*j as usize] = '.';
-        }
+        grid[*i][*j] = '#';
+        p2 += iterate_until_done(&grid, pos, &mut empty, false).is_none() as usize;
+        grid[*i][*j] = '.';
     }
     (p1.to_string(), p2.to_string())
 }
@@ -66,36 +53,34 @@ pub fn solve() -> Solution {
 /// Iterates until outside or a loop is found
 fn iterate_until_done(
     grid: &Vec<Vec<char>>,
-    start_pos: (i64, i64),
-    visited: &mut HashSet<(i64, i64)>,
+    start_pos: (usize, usize),
+    visited: &mut HashSet<(usize, usize)>,
+    add: bool,
 ) -> Option<usize> {
     let mut pos = start_pos;
     let mut dir = Dir::Up;
-    let mut turns = HashSet::from([(pos.0, pos.1, dir as usize)]);
+    let mut turns = HashSet::from([(pos, dir)]);
     let grid_w = grid[0].len();
-    while pos.0 >= 0 && (pos.0 as usize) < grid.len() && pos.1 >= 0 && (pos.1 as usize) < grid_w {
+    loop {
         for _ in 0..4 {
             let new_pos = dir.inc(pos);
-            if !(new_pos.0 >= 0
-                && (new_pos.0 as usize) < grid.len()
-                && new_pos.1 >= 0
-                && (new_pos.1 as usize) < grid_w)
-            {
-                pos = new_pos;
-                break;
+            if !(new_pos.0 < grid.len() && new_pos.1 < grid_w) {
+                return Some(visited.len());
             }
-            if grid[new_pos.0 as usize][new_pos.1 as usize] == '#' {
-                dir = dir.next();
-            } else {
-                pos = new_pos;
-                visited.insert(pos);
-                if turns.contains(&(pos.0, pos.1, dir as usize)) {
-                    return None;
+            match grid[new_pos.0][new_pos.1] {
+                '#' => dir = dir.next(),
+                _ => {
+                    pos = new_pos;
+                    if add {
+                        visited.insert(pos);
+                    }
+                    if turns.contains(&(pos, dir)) {
+                        return None;
+                    }
+                    turns.insert((pos, dir));
+                    break;
                 }
-                turns.insert((pos.0, pos.1, dir as usize));
-                break;
             }
         }
     }
-    Some(visited.len())
 }
