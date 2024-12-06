@@ -35,7 +35,9 @@ pub fn solve() -> Solution {
         .split("\n")
         .map(|x| x.chars().collect::<Vec<char>>())
         .collect();
-    let mut pos = 'brk: {
+    let mut cpy = grid.clone();
+
+    let pos = 'brk: {
         for (i, row) in grid.iter().enumerate() {
             for (j, c) in row.iter().enumerate() {
                 if *c == '^' {
@@ -45,9 +47,31 @@ pub fn solve() -> Solution {
         }
         (0, 0)
     };
-    let mut dir = Dir::Up;
     let mut visited = HashSet::from([pos]);
-    let mut turns = HashSet::from([(pos, dir)]);
+    let p1 = iterate_until_done(&grid, pos, &mut visited).unwrap();
+    let mut p2 = 0;
+    for (i, j) in visited.iter() {
+        if grid[*i as usize][*j as usize] == '.' {
+            cpy[*i as usize][*j as usize] = '#';
+            match iterate_until_done(&cpy, pos, &mut HashSet::from([pos])) {
+                None => p2 += 1,
+                Some(_) => {}
+            }
+            cpy[*i as usize][*j as usize] = '.';
+        }
+    }
+    (p1.to_string(), p2.to_string())
+}
+
+/// Iterates until outside or a loop is found
+fn iterate_until_done(
+    grid: &Vec<Vec<char>>,
+    start_pos: (i64, i64),
+    visited: &mut HashSet<(i64, i64)>,
+) -> Option<usize> {
+    let mut pos = start_pos;
+    let mut dir = Dir::Up;
+    let mut turns = HashSet::from([(pos.0, pos.1, dir as usize)]);
     let grid_w = grid[0].len();
     while pos.0 >= 0 && (pos.0 as usize) < grid.len() && pos.1 >= 0 && (pos.1 as usize) < grid_w {
         for _ in 0..4 {
@@ -60,15 +84,18 @@ pub fn solve() -> Solution {
                 pos = new_pos;
                 break;
             }
-            if grid[new_pos.0 as usize][new_pos.1 as usize] == '.' {
+            if grid[new_pos.0 as usize][new_pos.1 as usize] == '#' {
+                dir = dir.next();
+            } else {
                 pos = new_pos;
                 visited.insert(pos);
+                if turns.contains(&(pos.0, pos.1, dir as usize)) {
+                    return None;
+                }
+                turns.insert((pos.0, pos.1, dir as usize));
                 break;
-            } else {
-                dir = dir.next();
             }
         }
-        println!("{:?}", pos);
     }
-    (visited.len().to_string(), "".to_string())
+    Some(visited.len())
 }
