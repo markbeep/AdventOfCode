@@ -32,7 +32,7 @@ pub fn solve() -> Solution {
 }
 
 fn concat(a: usize, b: usize) -> usize {
-    a * (10 as usize).pow(1 + b.ilog10()) + b
+    a * 10usize.pow(1 + b.ilog10()) + b
 }
 
 fn rec(sum: usize, cur: usize, nums: &Vec<usize>, i: usize, c: bool) -> bool {
