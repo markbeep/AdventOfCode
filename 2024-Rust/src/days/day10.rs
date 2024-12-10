@@ -18,44 +18,22 @@ pub fn solve() -> Solution {
     for (i, row) in grid.iter().enumerate() {
         for (j, num) in row.iter().enumerate() {
             if *num == 0 {
-                p1 += dfs((i, j), &grid, &mut HashSet::new());
-                p2 += dfs2((i, j), &grid, HashSet::new());
+                let mut x = &mut HashSet::new();
+                p1 += dfs((i, j), &grid, &mut x, true);
+                p2 += dfs((i, j), &grid, &mut x, false);
             }
         }
     }
     (p1.to_string(), p2.to_string())
 }
 
-fn dfs2((i, j): (usize, usize), grid: &Vec<Vec<u32>>, vis: HashSet<(usize, usize)>) -> usize {
-    if vis.contains(&(i, j)) {
-        return 0;
-    }
-    let mut vis = vis.clone();
-    vis.insert((i, j));
-
-    let now = grid[i][j];
-    if now == 9 {
-        return 1;
-    }
-
-    let mut c = 0;
-    if i > 0 && grid[i - 1][j] == now + 1 {
-        c += dfs2((i - 1, j), grid, vis.clone());
-    }
-    if i < grid.len() - 1 && grid[i + 1][j] == now + 1 {
-        c += dfs2((i + 1, j), grid, vis.clone());
-    }
-    if j > 0 && grid[i][j - 1] == now + 1 {
-        c += dfs2((i, j - 1), grid, vis.clone());
-    }
-    if j < grid[0].len() - 1 && grid[i][j + 1] == now + 1 {
-        c += dfs2((i, j + 1), grid, vis.clone());
-    }
-    c
-}
-
-fn dfs((i, j): (usize, usize), grid: &Vec<Vec<u32>>, vis: &mut HashSet<(usize, usize)>) -> usize {
-    if vis.contains(&(i, j)) {
+fn dfs(
+    (i, j): (usize, usize),
+    grid: &Vec<Vec<u32>>,
+    vis: &mut HashSet<(usize, usize)>,
+    p1: bool,
+) -> usize {
+    if p1 && vis.contains(&(i, j)) {
         return 0;
     }
     vis.insert((i, j));
@@ -64,19 +42,18 @@ fn dfs((i, j): (usize, usize), grid: &Vec<Vec<u32>>, vis: &mut HashSet<(usize, u
     if now == 9 {
         return 1;
     }
-
     let mut c = 0;
     if i > 0 && grid[i - 1][j] == now + 1 {
-        c += dfs((i - 1, j), grid, vis);
+        c += dfs((i - 1, j), grid, vis, p1);
     }
     if i < grid.len() - 1 && grid[i + 1][j] == now + 1 {
-        c += dfs((i + 1, j), grid, vis);
+        c += dfs((i + 1, j), grid, vis, p1);
     }
     if j > 0 && grid[i][j - 1] == now + 1 {
-        c += dfs((i, j - 1), grid, vis);
+        c += dfs((i, j - 1), grid, vis, p1);
     }
     if j < grid[0].len() - 1 && grid[i][j + 1] == now + 1 {
-        c += dfs((i, j + 1), grid, vis);
+        c += dfs((i, j + 1), grid, vis, p1);
     }
     c
 }
