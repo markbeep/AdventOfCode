@@ -14,14 +14,44 @@ pub fn solve() -> Solution {
         })
         .collect::<Vec<_>>();
     let mut p1 = 0;
+    let mut p2 = 0;
     for (i, row) in grid.iter().enumerate() {
         for (j, num) in row.iter().enumerate() {
             if *num == 0 {
                 p1 += dfs((i, j), &grid, &mut HashSet::new());
+                p2 += dfs2((i, j), &grid, HashSet::new());
             }
         }
     }
-    (p1.to_string(), "".to_string())
+    (p1.to_string(), p2.to_string())
+}
+
+fn dfs2((i, j): (usize, usize), grid: &Vec<Vec<u32>>, vis: HashSet<(usize, usize)>) -> usize {
+    if vis.contains(&(i, j)) {
+        return 0;
+    }
+    let mut vis = vis.clone();
+    vis.insert((i, j));
+
+    let now = grid[i][j];
+    if now == 9 {
+        return 1;
+    }
+
+    let mut c = 0;
+    if i > 0 && grid[i - 1][j] == now + 1 {
+        c += dfs2((i - 1, j), grid, vis.clone());
+    }
+    if i < grid.len() - 1 && grid[i + 1][j] == now + 1 {
+        c += dfs2((i + 1, j), grid, vis.clone());
+    }
+    if j > 0 && grid[i][j - 1] == now + 1 {
+        c += dfs2((i, j - 1), grid, vis.clone());
+    }
+    if j < grid[0].len() - 1 && grid[i][j + 1] == now + 1 {
+        c += dfs2((i, j + 1), grid, vis.clone());
+    }
+    c
 }
 
 fn dfs((i, j): (usize, usize), grid: &Vec<Vec<u32>>, vis: &mut HashSet<(usize, usize)>) -> usize {
