@@ -12,3 +12,7 @@ RUN apt-get update && apt-get install -y \
 RUN curl -o zig.tar.xz https://ziglang.org/builds/zig-x86_64-linux-0.16.0-dev.1484+d0ba6642b.tar.xz
 RUN tar -xf zig.tar.xz && mv zig-* /usr/zig && rm -rf zig.tar.xz zig-*
 ENV PATH="/usr/zig:$PATH"
+
+# Zls
+RUN curl -o zls.tar.xz https://builds.zigtools.org/zls-x86_64-linux-0.15.0.tar.xz
+RUN tar -xf zls.tar.xz && mv zls /usr/bin/zls && rm -rf zls.tar.xz

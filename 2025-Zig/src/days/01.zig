@@ -1,7 +1,7 @@
 const std = @import("std");
 
 pub fn main() !void {
-    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    var gpa = std.heap.GeneralPurposeAllocator(.{}).init;
     defer _ = gpa.deinit();
     const alloc = gpa.allocator();
 
@@ -21,8 +21,7 @@ fn p1(buf: []u8) !void {
         if (line.len == 0) continue;
         const move = try std.fmt.parseInt(i32, line[1..], 10);
         c = @mod(if (line[0] == 'L') c - move else c + move, 100);
-        if (c < 0) c += 100;
-        if (c == 0) pw += 1;
+        pw += @intFromBool(c == 0);
     }
     std.debug.print("p1: {d}\n", .{pw});
 }
@@ -36,11 +35,10 @@ fn p2(buf: []u8) !void {
         const move = try std.fmt.parseInt(i32, line[1..], 10);
         if (line[0] == 'L') {
             if (move >= c) {
-                if (c != 0) pw += 1;
+                pw += @intFromBool(c != 0);
                 pw += @divFloor(move - c, 100);
             }
             c = @mod(c - move, 100);
-            if (c < 0) c += 100;
         } else {
             if (move >= 100 - c) {
                 pw += 1 + @divFloor(move - (100 - c), 100);
