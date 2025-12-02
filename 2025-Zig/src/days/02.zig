@@ -7,18 +7,30 @@ pub fn main() !void {
     try p(content);
 }
 
+var c1: u64 = 0;
+var c2: u64 = 0;
+
+fn check(from: u64, to: u64) !void {
+    for (from..to + 1) |x| {
+        if (!try isValid(x)) _ = @atomicRmw(u64, &c1, .Add, x, .acq_rel);
+        if (!try isValid2(x)) _ = @atomicRmw(u64, &c2, .Add, x, .acq_rel);
+    }
+}
+
 fn p(buf: []u8) !void {
     var iter = std.mem.splitScalar(u8, buf, ',');
-    var c1: u64 = 0;
-    var c2: u64 = 0;
+    var threads: [100]std.Thread = undefined;
+
+    var i: u64 = 0;
     while (iter.next()) |elem| {
         var nums_iter = std.mem.splitScalar(u8, elem, '-');
         const from = try std.fmt.parseInt(u64, nums_iter.next().?, 10);
         const to = try std.fmt.parseInt(u64, nums_iter.next().?, 10);
-        for (from..to + 1) |x| {
-            if (!try isValid(x)) c1 += x;
-            if (!try isValid2(x)) c2 += x;
-        }
+        threads[i] = try std.Thread.spawn(.{}, check, .{ from, to });
+        i += 1;
+    }
+    for (threads[0..i]) |thread| {
+        thread.join();
     }
     std.debug.print("p1: {d}\np2: {d}\n", .{ c1, c2 });
 }
