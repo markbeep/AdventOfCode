@@ -9,8 +9,7 @@ pub fn main() !void {
     const buf = try cwd.readFileAlloc("days/02.txt", alloc, .unlimited);
     defer alloc.free(buf);
 
-    // try p1(buf);
-    try p2(buf);
+    try p(buf);
 }
 
 fn comp(x: []u8, y: []u8) bool {
@@ -29,22 +28,6 @@ fn isValid(x: u64) !bool {
         if (comp(str[0..i], str[i..])) return false;
     }
     return true;
-}
-
-fn p1(buf: []u8) !void {
-    var iter = std.mem.splitScalar(u8, buf, ',');
-    var c: u64 = 0;
-    while (iter.next()) |elem| {
-        var nums_iter = std.mem.splitScalar(u8, elem, '-');
-        const first = nums_iter.next() orelse "0";
-        const second = nums_iter.next() orelse "0";
-        const from = try std.fmt.parseInt(u64, first, 10);
-        const to = try std.fmt.parseInt(u64, second, 10);
-        for (from..to + 1) |x| {
-            if (!try isValid(x)) c += x;
-        }
-    }
-    std.debug.print("p1: {d}\n", .{c});
 }
 
 fn isValid2(x: u64) !bool {
@@ -66,9 +49,10 @@ fn isValid2(x: u64) !bool {
     return true;
 }
 
-fn p2(buf: []u8) !void {
+fn p(buf: []u8) !void {
     var iter = std.mem.splitScalar(u8, buf, ',');
-    var c: u64 = 0;
+    var c1: u64 = 0;
+    var c2: u64 = 0;
     while (iter.next()) |elem| {
         var nums_iter = std.mem.splitScalar(u8, elem, '-');
         const first = nums_iter.next() orelse "0";
@@ -76,8 +60,9 @@ fn p2(buf: []u8) !void {
         const from = try std.fmt.parseInt(u64, first, 10);
         const to = try std.fmt.parseInt(u64, second, 10);
         for (from..to + 1) |x| {
-            if (!try isValid2(x)) c += x;
+            if (!try isValid(x)) c1 += x;
+            if (!try isValid2(x)) c2 += x;
         }
     }
-    std.debug.print("p2: {d}\n", .{c});
+    std.debug.print("p1: {d}\np2: {d}\n", .{ c1, c2 });
 }
