@@ -1,6 +1,6 @@
 const _2025_Zig = @import("_2025_Zig");
-const _02 = @import("days/02.zig");
+const _03 = @import("days/03.zig");
 
 pub fn main() !void {
-    try _02.main();
+    try _03.main();
 }
