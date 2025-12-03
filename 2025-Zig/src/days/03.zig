@@ -84,6 +84,24 @@ fn pr(x: []u64) void {
     std.debug.print("\n", .{});
 }
 
+const Index = struct {
+    val: u64,
+    index: u64,
+};
+
+fn find_best(x: []const u8) Index {
+    var ind: u64 = 0;
+    var val: u64 = @as(u64, x[0]) - 48;
+    for (x[1..], 1..) |c, i| {
+        const cv = @as(u64, c) - 48;
+        if (cv > val) {
+            val = cv;
+            ind = i;
+        }
+    }
+    return Index{ .val = val, .index = ind };
+}
+
 fn p2(buf: []const u8) !u64 {
     var c: u64 = 0;
 
@@ -91,17 +109,14 @@ fn p2(buf: []const u8) !u64 {
     while (iter.next()) |bank| {
         if (bank.len == 0) continue;
         var x: [12]u64 = undefined;
-        var afts: [12]u64 = undefined;
-        for (0..12) |i| x[i] = @as(u64, bank[bank.len - 12 + i]) - 48;
-        for (0..12) |i| afts[i] = x[i];
-        for (12..bank.len) |i| {
-            const batt = @as(u64, bank[bank.len - 1 - i]) - 48;
-            trickle(batt, &x, &afts);
-            // pr(&x);
+
+        var last_index: u64 = 0;
+        for (0..12) |i| {
+            const ind = find_best(bank[last_index .. bank.len - 11 + i]);
+            last_index = last_index + ind.index + 1;
+            x[i] = ind.val;
         }
-        // std.debug.print("bank: {d}\n", .{mx});
         c += try adder(&x);
-        pr(&x);
     }
 
     return c;
