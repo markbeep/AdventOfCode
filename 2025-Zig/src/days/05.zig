@@ -38,9 +38,9 @@ fn p(buf: []const u8) !void {
     }
 
     // part 2
-    var changes: u64 = 1; // lol
-    while (changes > 0) {
-        changes = 0;
+    var changed: bool = true; // lol
+    while (changed) {
+        changed = false;
         for (0..rc, ranges[0..rc]) |a, *ra| {
             for (ranges[a + 1 .. rc]) |*rb| {
                 // (): a, []: b
@@ -48,21 +48,21 @@ fn p(buf: []const u8) !void {
                 // (  []  )
                 if (ra.from <= rb.from and ra.to >= rb.to) {
                     rb.inv = true;
-                    changes += 1;
+                    changed = true;
                 } // (   [ ) ]
                 else if (ra.from <= rb.from and ra.to <= rb.to and ra.to >= rb.from) {
                     ra.to = rb.to;
                     rb.inv = true;
-                    changes += 1;
+                    changed = true;
                 } // [  ()  ]
                 else if (ra.from >= rb.from and ra.to <= rb.to) {
                     ra.inv = true;
-                    changes += 1;
+                    changed = true;
                 } // [ ( ] )
                 else if (ra.from >= rb.from and ra.to >= rb.to and ra.from <= rb.to) {
                     ra.from = rb.from;
                     rb.inv = true;
-                    changes += 1;
+                    changed = true;
                 }
             }
         }
