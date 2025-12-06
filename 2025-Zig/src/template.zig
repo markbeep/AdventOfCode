@@ -5,7 +5,7 @@ pub fn main() !void {
     var buf: [30000]u8 = undefined;
     const content = try cwd.readFile("days/xx.txt", &buf);
     try p1(content);
-    try p2(content);
+    // try p2(content);
 }
 
 fn p1(buf: []const u8) !void {
